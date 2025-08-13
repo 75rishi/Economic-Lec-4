@@ -1,0 +1,1942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> economic Quiz Application</title>
+    <style>
+        /* General Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Poppins', sans-serif;
+            min-height: 100vh;
+            transition: background 0.5s ease;
+            overflow-x: hidden;
+        }
+
+        /* First Page Styles */
+        #startPage {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+      .box {
+    background: linear-gradient(45deg, rgb(218, 0, 171), rgb(0, 255, 191), rgb(255, 221, 0), rgb(218, 0, 171));
+    background-size: 400% 400%;
+    padding: 8px 50px;
+    font-size: 2.1rem;
+    font-weight: 700;
+    font-family: 'Tangerine', cursive;
+    color: black;
+    box-shadow: 0 0 50px rgb(0, 255, 191);
+    outline: 4px solid black;
+    outline-offset: 5px;
+    cursor: pointer;
+    border-radius: 10px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    animation: gradientFlow 5s ease infinite, pulse 1s infinite;
+    transition: background 0.5s ease, box-shadow 0.3s ease;
+}
+
+@keyframes gradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.box:hover {
+    background: linear-gradient(45deg, rgb(0, 255, 255), rgb(255, 0, 255), rgb(255, 255, 0), rgb(0, 255, 255));
+    background-size: 400% 400%;
+    box-shadow: 0 0 50px rgb(255, 0, 255);
+}
+
+        .box:hover {
+            background-color: rgb(56, 255, 242);
+            box-shadow: 0 0 80px yellow;
+            outline-color: rgb(0, 255, 102);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 50px rgb(0, 255, 0); }
+            50% { box-shadow: 0 0 100px rgb(255, 0, 0); }
+            100% { box-shadow: 0 0 50px rgb(104, 61, 82); }
+        }
+
+        .loading-text {
+            position: relative;
+            font-family: 'Allura', cursive;
+            background: linear-gradient(90deg, rgb(255, 0, 0), #0ff, #00f) -1810% / 114%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font: 900 clamp(2em, 6vw, 4em) 'Allura', cursive;
+            animation: shimmer 2s linear infinite, glitch 2s infinite;
+        }
+
+        @keyframes shimmer {
+            to { background-position: 100%; }
+        }
+
+        @keyframes glitch {
+            0%, 100% { transform: none; opacity: 1; }
+            92% { transform: translateX(-1px) skew(0deg); opacity: 0.9; }
+            94% { transform: translateX(2px) skew(-2deg); opacity: 1; }
+            96% { transform: translateX(-1px) skew(1deg); opacity: 0.95; }
+            98% { transform: translateX(1px) skew(-1deg); opacity: 1; }
+        }
+
+        /* Quiz Page Styles */
+        #quizPage {
+            background: linear-gradient(135deg, #452c4753, #13a155);
+            color: #000000;
+            position: relative;
+            min-height: 100vh;
+            display: none;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+
+       .card {
+    background: linear-gradient(135deg, #91b9d8, #83b1a8, #b8afed);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgb(183, 56, 56);
+    padding: 20px;
+    margin-bottom: 30px;
+    transition: transform 0.2s;
+}
+
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .question .en {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #000000;
+            margin-top: 5px;
+        }
+
+        .options button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 10px;
+            margin: 5px 0;
+            border: 3px solid #000;
+            border-radius: 8px;
+            background: #9cb7cf;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background 0.4s ease, transform 0.1s, border-color 0.4s ease, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+            color: #000;
+        }
+
+        .options button:hover {
+            background: #f4ff1f;
+            border-color: #9d00ff;
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .options button.correct {
+            background: #6cff5e !important;
+            border-color: #ae00ff !important;
+            cursor: default;
+            color: #000 !important;
+             font-weight: bold;
+        }
+
+        .options button.wrong {
+            background: #b51010 !important;
+            border-color: #000 !important;
+            cursor: default;
+            color: #000 !important;
+        }
+
+        .options button.disabled {
+            pointer-events: none;
+            color: #000;
+        }
+
+        .options button::after {
+            content: '';
+            position: absolute;
+            background: rgb(212, 51, 51);
+            border-radius: 50%;
+            width: 0;
+            height: 0;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .options button:active::after {
+            animation: ripple 0.6s ease-out;
+        }
+
+        @keyframes ripple {
+            to { width: 300px; height: 300px; opacity: 0; }
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .controls button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #4311e8, #ff00dd, #cbd6db, #4311e8);
+            background-size: 400% 400%;
+            animation: flowGradient 5s ease infinite;
+            transition: transform 0.3s ease, box-shadow 0.5s ease;
+            color: #000;
+        }
+
+        .controls button:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+        }
+
+        @keyframes flowGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .explanation {
+            margin-top: 10px;
+            padding: 10px;
+            background: #89b2f4;
+            border-left: 4px solid #000000;
+            font-size: 0.95rem;
+            animation: slideDown 0.4s ease;
+            opacity: 0;
+            transform: translateY(-10px);
+            font-weight: bold;
+        }
+
+        .explanation.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .progress {
+            height: 8px;
+            background: #fff;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: linear-gradient(90deg, #18ff03d6, #ff2802);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #3e5a52;
+            position: absolute;
+            top: -16px;
+            right: -20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.8rem;
+            transform: scale(0);
+            animation: grow 0.5s ease forwards;
+        }
+
+        @keyframes grow {
+            to { transform: scale(1); }
+        }
+
+        #timerContainer {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            color: #000;
+            z-index: 9999;
+            user-select: none;
+            min-width: 180px;
+            text-align: center;
+        }
+
+        #timerContainer.hidden {
+            visibility: hidden;
+        }
+
+        #timerBar {
+            width: 100%;
+            height: 10px;
+            background: #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        #timerBarFill {
+            height: 100%;
+            background: #ff4444;
+            width: 100%;
+            transition: width 1s linear, background 1s ease;
+        }
+
+        /* Dashboard Page Styles */
+        #dashboardPage {
+            background: linear-gradient(45deg, #a1c4fd, #c2e9fb, #d4fc79);
+            background-size: 600% 400%;
+            animation: flow 5s ease-in-out infinite;
+            padding: 40px;
+            display: none;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: slideUpContainer 1.2s ease-in-out;
+        }
+
+        @keyframes slideUpContainer {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .dashboard-container h2 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            animation: bounceIn 1s ease-in-out;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            60% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 30px;
+            padding: 20px 0;
+        }
+
+        .dash-box {
+            border: 4px solid rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+            background-size: 800% 600%;
+            animation: waveFlow 6s ease-in-out infinite, floatUpDown 3s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes floatUpDown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes waveFlow {
+            0% { background-position: 0% 50%; filter: brightness(1) saturate(1); }
+            25% { background-position: 50% 55%; filter: brightness(1.3) saturate(1.3); }
+            50% { background-position: 100% 50%; filter: brightness(1.5) saturate(1.4); }
+            75% { background-position: 50% 45%; filter: brightness(1.3) saturate(1.2); }
+            100% { background-position: 0% 50%; filter: brightness(1) saturate(1); }
+        }
+
+        .dash-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(-45deg, rgba(112, 201, 239, 0.15), rgba(109, 184, 121, 0.181), rgb(0, 0, 0));
+            animation: waveLine 6s ease-in-out infinite;
+            transform: rotate(45deg);
+            z-index: 0;
+            filter: drop-shadow(0 0 6px rgba(35, 218, 185, 0.6));
+        }
+
+        @keyframes waveLine {
+            0% { transform: rotate(45deg) translateX(120%) scale(0.85); opacity: 0.35; }
+            25% { transform: rotate(45deg) translateX(60%) scale(1); opacity: 0.65; }
+            50% { transform: rotate(45deg) translateX(-60%) scale(1.25); opacity: 1; }
+            75% { transform: rotate(25deg) translateX(30%) scale(1); opacity: 0.7; }
+            100% { transform: rotate(45deg) translateX(120%) scale(0.85); opacity: 0.35; }
+        }
+
+        .dash-box h4, .dash-box p {
+            position: relative;
+            z-index: 1;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .dash-box:nth-child(1) { background: linear-gradient(45deg, #ff6b6b, #ff9f43, #feca57); animation-delay: 0s; }
+        .dash-box:nth-child(2) { background: linear-gradient(45deg, #1dd1a1, #00d2d3, #54a0ff); animation-delay: 0.2s; }
+        .dash-box:nth-child(3) { background: linear-gradient(45deg, #ff4d4d, #ff793f, #ffcc99); animation-delay: 0.4s; }
+        .dash-box:nth-child(4) { background: linear-gradient(45deg, #40f752, #706fd3, #9980fa); animation-delay: 0.6s; }
+        .dash-box:nth-child(5) { background: linear-gradient(45deg, #ff9ff3, #feca57, #1dd1a1); animation-delay: 0.8s; }
+        .dash-box:nth-child(6) { background: linear-gradient(45deg, #54a0ff, #00d2d3, #ff6b6b); animation-delay: 1s; }
+        .dash-box:nth-child(7) { background: linear-gradient(45deg, #ffcc99, #ff4d4d, #9980fa); animation-delay: 1.2s; }
+        .dash-box:nth-child(8) { background: linear-gradient(45deg, #706fd3, #ff9ff3, #ff793f); animation-delay: 1.4s; }
+        .dash-box:nth-child(9) { background: linear-gradient(45deg, #feca57, #4834d4, #54a0ff); animation-delay: 1.6s; }
+        .dash-box:nth-child(10) { background: linear-gradient(45deg, #00d2d3, #ff6b6b, #ffcc99); animation-delay: 1.8s; }
+        .dash-box:nth-child(11) { background: linear-gradient(45deg, #ff793f, #1dd1a1, #706fd3); animation-delay: 2s; }
+        .dash-box:nth-child(12) { background: linear-gradient(45deg, #9980fa, #ff6b6b, #feca57); animation-delay: 2.2s; }
+        .dash-box:nth-child(13) { background: linear-gradient(45deg, #54a0ff, #ffcc99, #ff4d4d); animation-delay: 2.4s; }
+        .dash-box:nth-child(14) { background: linear-gradient(45deg, #ff9ff3, #00d2d3, #4834d4); animation-delay: 2.6s; }
+        .dash-box:nth-child(15) { background: linear-gradient(45deg, #feca57, #ff793f, #1dd1a1); animation-delay: 2.8s; }
+        .dash-box:nth-child(16) { background: linear-gradient(45deg, #706fd3, #ff6b6b, #54a0ff); animation-delay: 3s; }
+        .dash-box:nth-child(17) { background: linear-gradient(45deg, #ff4d4d, #9980fa, #00d2d3); animation-delay: 3.2s; }
+        .dash-box:nth-child(18) { background: linear-gradient(45deg, #ffcc99, #ff9ff3, #4834d4); animation-delay: 3.4s; }
+        .dash-box:nth-child(19) { background: linear-gradient(45deg, #1dd1a1, #ff793f, #706fd3); animation-delay: 3.6s; }
+        .dash-box:nth-child(20) { background: linear-gradient(45deg, #54a0ff, #feca57, #ff6b6b); animation-delay: 3.8s; }
+        .dash-box:nth-child(21) { background: linear-gradient(45deg, #9980fa, #ff4d4d, #00d2d3); animation-delay: 4s; }
+        .dash-box:nth-child(22) { background: linear-gradient(45deg, #ff9ff3, #ffcc99, #ff793f); animation-delay: 4.2s; }
+        .dash-box:nth-child(23) { background: linear-gradient(45deg, #4834d4, #1dd1a1, #54a0ff); animation-delay: 4.4s; }
+        .dash-box:nth-child(24) { background: linear-gradient(45deg, #ff6b6b, #706fd3, #ff4d4d); animation-delay: 4.6s; }
+        .dash-box:nth-child(25) { background: linear-gradient(45deg, #00d2d3, #ff9ff3, #feca57); animation-delay: 4.8s; }
+        .dash-box:nth-child(26) { background: linear-gradient(45deg, #ffcc99, #54a0ff, #9980fa); animation-delay: 5s; }
+        .dash-box:nth-child(27) { background: linear-gradient(45deg, #ff793f, #ff6b6b, #1dd1a1); animation-delay: 5.2s; }
+        .dash-box:nth-child(28) { background: linear-gradient(45deg, #706fd3, #ff4d4d, #00d2d3); animation-delay: 5.4s; }
+        .dash-box:nth-child(29) { background: linear-gradient(45deg, #feca57, #9980fa, #ff9ff3); animation-delay: 5.6s; }
+        .dash-box:nth-child(30) { background: linear-gradient(45deg, #54a0ff, #ff793f, #ff6b6b); animation-delay: 5.8s; }
+
+        .dash-box:hover {
+            transform: scale(1.15) translateY(-10px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            filter: brightness(1.3);
+        }
+
+        .dash-box h4 {
+            margin: 0;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .dash-box p {
+            font-size: 28px;
+            margin: 12px 0 0;
+        }
+
+        .back-button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #4311e8, #ff00dd, #cbd6db, #4311e8);
+            background-size: 400% 400%;
+            animation: flowGradient 5s ease infinite;
+            color: #000;
+        }
+
+        .back-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+        }
+
+        #restartModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border: 1px solid black;
+            z-index: 1000;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 768px) {
+            .container, .dashboard-container {
+                padding: 20px;
+            }
+            .grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                gap: 20px;
+            }
+            .dash-box p {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Start Page -->
+    <div id="startPage">
+        <div class="box" onclick="goToQuizPage()">Start</div>
+        <div class="loading-text">Lucky</div>
+    </div>
+
+    <!-- Quiz Page -->
+    <div id="quizPage">
+        <div id="timerContainer">
+            <div>Total Time: <span id="totalTime">00:00</span></div>
+            <div id="timerBar"><div id="timerBarFill"></div></div>
+        </div>
+        <div class="container" id="quizContainer">
+            <h1> economic lec 4 </h1>
+            <div id="score"></div>
+            <div class="progress">
+                <div class="progress-bar" id="progressBar"></div>
+                <div class="progress-circle" id="progressCircle">0%</div>
+            </div>
+            <div id="quiz"></div>
+            <div class="controls">
+                <button class="submit" onclick="submitQuiz()">Submit</button>
+                <button class="restart" onclick="openRestartModal()">Restart</button>
+                <button class="dashboard" onclick="goToDashboard()">Show Dashboard</button>
+            </div>
+            <select id="languageToggle" onchange="toggleLanguage()">
+                <option value="hi">हिन्दी</option>
+                <option value="en">English</option>
+                <option value="both">Both</option>
+            </select>
+            <div id="restartModal">
+                <h2>Select Questions to Restart</h2>
+                <div id="questionCheckboxes"></div>
+                <button onclick="applyRestart()">Apply</button>
+                <button onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboardPage">
+        <div class="dashboard-container">
+            <h2>🎓 Quiz Result Dashboard</h2>
+            <div class="grid" id="dashboardGrid"></div>
+            <button class="back-button" onclick="goToQuizPage()">Back to Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+    {
+        "q": "कारक लागत पर जीडीपी की परिभाषा क्या है?",
+        "q_en": "What is the definition of GDP at Factor Cost?",
+        "options": [
+            "बाजार मूल्य पर जीडीपी में अप्रत्यक्ष कर जोड़कर",
+            "बाजार मूल्य पर जीडीपी से अप्रत्यक्ष कर घटाकर और सब्सिडी जोड़कर",
+            "केवल उपभोक्ता खर्च का योग",
+            "निर्यात और आयात का शुद्ध मूल्य"
+        ],
+        "options_en": [
+            "GDP at market price plus indirect taxes",
+            "GDP at market price minus indirect taxes plus subsidies",
+            "Sum of consumer spending only",
+            "Net value of exports and imports"
+        ],
+        "answer": 1,
+        "explanation": "नोट्स के अनुसार, कारक लागत पर जीडीपी की गणना बाजार मूल्य पर जीडीपी से अप्रत्यक्ष कर घटाकर और सब्सिडी जोड़कर की जाती है।",
+        "explanation_en": "According to the notes, GDP at factor cost is calculated by subtracting indirect taxes from GDP at market price and adding subsidies."
+    },
+    {
+        "q": "बाजार मूल्य पर जीडीपी की गणना का सूत्र क्या है?",
+        "q_en": "What is the formula for calculating GDP at Market Price?",
+        "options": [
+            "जीडीपी = C + I + G",
+            "जीडीपी = कारक लागत पर जीडीपी + अप्रत्यक्ष कर - सब्सिडी",
+            "जीडीपी = कारक लागत पर जीडीपी - अप्रत्यक्ष कर",
+            "जीडीपी = निर्यात - आयात"
+        ],
+        "options_en": [
+            "GDP = C + I + G",
+            "GDP = GDP at factor cost + indirect taxes - subsidies",
+            "GDP = GDP at factor cost - indirect taxes",
+            "GDP = Exports - Imports"
+        ],
+        "answer": 1,
+        "explanation": "नोट्स में निर्दिष्ट किया गया है कि बाजार मूल्य पर जीडीपी की गणना कारक लागत पर जीडीपी में अप्रत्यक्ष कर जोड़कर और सब्सिडी घटाकर की जाती है।",
+        "explanation_en": "The notes specify that GDP at market price is calculated as GDP at factor cost plus indirect taxes minus subsidies."
+    },
+    {
+        "q": "नाममात्र जीडीपी क्या है?",
+        "q_en": "What is Nominal GDP?",
+        "options": [
+            "मुद्रास्फीति के लिए समायोजित जीडीपी",
+            "वर्तमान कीमतों पर जीडीपी",
+            "आधार वर्ष की कीमतों पर जीडीपी",
+            "शुद्ध निर्यात पर आधारित जीडीपी"
+        ],
+        "options_en": [
+            "GDP adjusted for inflation",
+            "GDP at current prices",
+            "GDP at base-year prices",
+            "GDP based on net exports"
+        ],
+        "answer": 1,
+        "explanation": "नोट्स में नाममात्र जीडीपी को वर्तमान कीमतों पर गणना की गई जीडीपी के रूप में परिभाषित किया गया है, बिना मुद्रास्फीति के लिए समायोजन के।",
+        "explanation_en": "The notes define nominal GDP as GDP calculated at current prices without adjustment for inflation."
+    },
+    {
+        "q": "वास्तविक जीडीपी की गणना कैसे की जाती है?",
+        "q_en": "How is Real GDP calculated?",
+        "options": [
+            "नाममात्र जीडीपी × मूल्य अपस्फीति",
+            "नाममात्र जीडीपी ÷ मूल्य अपस्फीति",
+            "नाममात्र जीडीपी + मूल्य अपस्फीति",
+            "नाममात्र जीडीपी - मूल्य अपस्फीति"
+        ],
+        "options_en": [
+            "Nominal GDP × GDP Deflator",
+            "Nominal GDP ÷ GDP Deflator",
+            "Nominal GDP + GDP Deflator",
+            "Nominal GDP - GDP Deflator"
+        ],
+        "answer": 1,
+        "explanation": "नोट्स में सूत्र दिया गया है: वास्तविक जीडीपी = नाममात्र जीडीपी ÷ जीडीपी डिफ्लेटर।",
+        "explanation_en": "The notes provide the formula: Real GDP = Nominal GDP ÷ GDP Deflator."
+    },
+    {
+        "q": "जीडीपी डिफ्लेटर का सूत्र क्या है?",
+        "q_en": "What is the formula for GDP Deflator?",
+        "options": [
+            "(नाममात्र जीडीपी ÷ वास्तविक जीडीपी) × 100",
+            "(वास्तविक जीडीपी ÷ नाममात्र जीडीपी) × 100",
+            "नाममात्र जीडीपी × वास्तविक जीडीपी",
+            "नाममात्र जीडीपी - वास्तविक जीडीपी"
+        ],
+        "options_en": [
+            "(Nominal GDP ÷ Real GDP) × 100",
+            "(Real GDP ÷ Nominal GDP) × 100",
+            "Nominal GDP × Real GDP",
+            "Nominal GDP - Real GDP"
+        ],
+        "answer": 0,
+        "explanation": "नोट्स में कहा गया है कि जीडीपी डिफ्लेटर की गणना (नाममात्र जीडीपी ÷ वास्तविक जीडीपी) × 100 के रूप में की जाती है।",
+        "explanation_en": "The notes state that the GDP deflator is calculated as (Nominal GDP ÷ Real GDP) × 100."
+    },
+    {
+        "q": "आधार वर्ष क्या है?",
+        "q_en": "What is a Base Year?",
+        "options": [
+            "वह वर्ष जिसमें जीडीपी की गणना नहीं की जाती",
+            "वह वर्ष जिसे जीडीपी की गणना के लिए संदर्भ बिंदु के रूप में उपयोग किया जाता है",
+            "वह वर्ष जिसमें सबसे अधिक मुद्रास्फीति होती है",
+            "वह वर्ष जिसमें जीडीपी सबसे कम होती है"
+        ],
+        "options_en": [
+            "The year in which GDP is not calculated",
+            "The year used as a reference point for calculating GDP",
+            "The year with the highest inflation",
+            "The year with the lowest GDP"
+        ],
+        "answer": 1,
+        "explanation": "नोट्स में आधार वर्ष को एक विशिष्ट संदर्भ वर्ष के रूप में वर्णित किया गया है जिसका उपयोग समय के साथ जीडीपी डेटा की तुलना के लिए किया जाता है।",
+        "explanation_en": "The notes describe the base year as a specific reference year used to calculate GDP data for comparison over time."
+    },
+    {
+        "q": "भारत ने अपना आधार वर्ष कितनी बार संशोधित किया है?",
+        "q_en": "How many times has India revised its base year?",
+        "options": [
+            "पांच बार",
+            "सात बार",
+            "दस बार",
+            "तीन बार"
+        ],
+        "options_en": [
+            "Five times",
+            "Seven times",
+            "Ten times",
+            "Three times"
+        ],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि भारत ने अपने आधार वर्ष को सात बार संशोधित किया है।",
+        "explanation_en": "The notes mention that India has revised its base year seven times."
+    },
+    {
+        "q": "भारत का सबसे हालिया आधार वर्ष संशोधन कब हुआ?",
+        "q_en": "When was India’s most recent base year revision?",
+        "options": [
+            "2005 से 2010",
+            "2005 से 2012",
+            "2010 से 2015",
+            "2012 से 2018"
+        ],
+        "options_en": [
+            "From 2005 to 2010",
+            "From 2005 to 2012",
+            "From 2010 to 2015",
+            "From 2012 to 2018"
+        ],
+        "answer": 1,
+        "explanation": "नोट्स में कहा गया है कि सबसे हालिया संशोधन में आधार वर्ष 2005 से बदलकर 2012 किया गया।",
+        "explanation_en": "The notes state that the most recent revision changed the base year from 2005 to 2012."
+    },
+    {
+        "q": "शुद्ध घरेलू उत्पाद (NDP) की गणना कैसे की जाती है?",
+        "q_en": "How is Net Domestic Product (NDP) calculated?",
+        "options": [
+            "NDP = GDP + मूल्यह्रास",
+            "NDP = GDP - मूल्यह्रास",
+            "NDP = GDP × मूल्यह्रास",
+            "NDP = GDP ÷ मूल्यह्रास"
+        ],
+        "options_en": [
+            "NDP = GDP + Depreciation",
+            "NDP = GDP - Depreciation",
+            "NDP = GDP × Depreciation",
+            "NDP = GDP ÷ Depreciation"
+        ],
+        "answer": 1,
+        "explanation": "नोट्स में निर्दिष्ट किया गया है कि NDP की गणना जीडीपी से मूल्यह्रास घटाकर की जाती है।",
+        "explanation_en": "The notes specify that NDP is calculated by subtracting depreciation from GDP."
+    },
+    {
+        "q": "मूल्यह्रास को और किस नाम से जाना जाता है?",
+        "q_en": "What is depreciation also known as?",
+        "options": [
+            "पूंजीगत हानि",
+            "पूंजीगत उपभोग खाता",
+            "शुद्ध निर्यात",
+            "अप्रत्यक्ष कर"
+        ],
+        "options_en": [
+            "Capital loss",
+            "Capital consumption account",
+            "Net exports",
+            "Indirect taxes"
+        ],
+        "answer": 1,
+        "explanation": "नोट्स में मूल्यह्रास को 'पूंजीगत उपभोग खाता' के रूप में संदर्भित किया गया है।",
+        "explanation_en": "The notes refer to depreciation as the 'capital consumption account.'"
+    },
+    {
+        "q": "राष्ट्रीय आय (NI) क्या है?",
+        "q_en": "What is National Income (NI)?",
+        "options": [
+            "केवल सरकारी खर्च का योग",
+            "किसी देश में उत्पन्न सभी वस्तुओं और सेवाओं का कुल मूल्य",
+            "केवल निर्यात का मूल्य",
+            "केवल आयात का मूल्य"
+        ],
+        "options_en": [
+            "Sum of government spending only",
+            "Total value of all goods and services produced in a country",
+            "Value of exports only",
+            "Value of imports only"
+        ],
+        "answer": 1,
+        "explanation": "नोट्स में राष्ट्रीय आय को एक निश्चित अवधि में किसी देश में उत्पन्न सभी वस्तुओं और सेवाओं के कुल मूल्य के रूप में परिभाषित किया गया है।",
+        "explanation_en": "The notes define national income as the total value of all goods and services produced in a country over a specific period."
+    },
+    {
+        "q": "राष्ट्रीय आय की गणना के कितने तरीके हैं?",
+        "q_en": "How many methods are there to calculate National Income?",
+        "options": [
+            "दो",
+            "तीन",
+            "चार",
+            "पांच"
+        ],
+        "options_en": [
+            "Two",
+            "Three",
+            "Four",
+            "Five"
+        ],
+        "answer": 1,
+        "explanation": "नोट्स में तीन तरीकों का उल्लेख है: आय विधि, उत्पाद/मूल्य वर्धित विधि, और व्यय विधि।",
+        "explanation_en": "The notes list three methods: Income Method, Product/Value Added Method, and Expenditure Method."
+    },
+    {
+        "q": "शुद्ध राष्ट्रीय उत्पाद (NNP) की गणना कैसे की जाती है?",
+        "q_en": "How is Net National Product (NNP) calculated?",
+        "options": [
+            "NNP = GNP + मूल्यह्रास",
+            "NNP = GNP - मूल्यह्रास",
+            "NNP = GDP + मूल्यह्रास",
+            "NNP = GDP - मूल्यह्रास"
+        ],
+        "options_en": [
+            "NNP = GNP + Depreciation",
+            "NNP = GNP - Depreciation",
+            "NNP = GDP + Depreciation",
+            "NNP = GDP - Depreciation"
+        ],
+        "answer": 1,
+        "explanation": "नोट्स में कहा गया है कि NNP की गणना GNP से मूल्यह्रास घटाकर की जाती है।",
+        "explanation_en": "The notes state that NNP is calculated by subtracting depreciation from GNP."
+    },
+    {
+        "q": "विशेष डेटा प्रसार मानक (SDDS) की स्थापना कब हुई?",
+        "q_en": "When was the Special Data Dissemination Standard (SDDS) established?",
+        "options": [
+            "1990",
+            "1996",
+            "2000",
+            "2005"
+        ],
+        "options_en": [
+            "1990",
+            "1996",
+            "2000",
+            "2005"
+        ],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि SDDS को IMF द्वारा 1996 में स्थापित किया गया था।",
+        "explanation_en": "The notes mention that SDDS was established by the IMF in 1996."
+    },
+    {
+        "q": "भारत कब SDDS का सदस्य बना?",
+        "q_en": "When did India become a member of SDDS?",
+        "options": [
+            "27 दिसंबर 1996",
+            "15 जनवरी 1995",
+            "30 मार्च 2000",
+            "10 अप्रैल 1998"
+        ],
+        "options_en": [
+            "December 27, 1996",
+            "January 15, 1995",
+            "March 30, 2000",
+            "April 10, 1998"
+        ],
+        "answer": 0,
+        "explanation": "नोट्स में निर्दिष्ट किया गया है कि भारत 27 दिसंबर 1996 को SDDS का सदस्य बना।",
+        "explanation_en": "The notes specify that India became an SDDS member on December 27, 1996."
+    },
+    {
+        "q": "कारक लागत में क्या शामिल नहीं है?",
+        "q_en": "What is not included in factor cost?",
+        "options": [
+            "श्रम की लागत",
+            "पूंजी पर ब्याज",
+            "अप्रत्यक्ष कर",
+            "भूमि की लागत"
+        ],
+        "options_en": [
+            "Cost of labor",
+            "Interest on capital",
+            "Indirect taxes",
+            "Cost of land"
+        ],
+        "answer": 2,
+        "explanation": "नोट्स में कहा गया है कि कारक लागत में श्रम, पूंजी, भूमि आदि की लागत शामिल होती है, लेकिन अप्रत्यक्ष कर शामिल नहीं होते।",
+        "explanation_en": "The notes state that factor cost includes costs like labor, capital, land, etc., but excludes indirect taxes."
+    },
+    {
+        "q": "बाजार मूल्य में क्या शामिल होता है?",
+        "q_en": "What is included in market price?",
+        "options": [
+            "केवल सब्सिडी",
+            "अप्रत्यक्ष कर सहित और सब्सिडी को छोड़कर",
+            "केवल मूल्यह्रास",
+            "केवल निर्यात"
+        ],
+        "options_en": [
+            "Subsidies only",
+            "Including indirect taxes and excluding subsidies",
+            "Depreciation only",
+            "Exports only"
+        ],
+        "answer": 1,
+        "explanation": "नोट्स में बाजार मूल्य पर जीडीपी को अप्रत्यक्ष कर शामिल करने और सब्सिडी को छोड़ने के रूप में परिभाषित किया गया है।",
+        "explanation_en": "The notes define GDP at market price as including indirect taxes and excluding subsidies."
+    },
+    {
+        "q": "हस्तांतरण भुगतान राष्ट्रीय आय का हिस्सा क्यों नहीं है?",
+        "q_en": "Why are transfer payments not part of national income?",
+        "options": [
+            "क्योंकि वे एकतरफा होते हैं",
+            "क्योंकि वे निर्यात से संबंधित हैं",
+            "क्योंकि वे अप्रत्यक्ष कर हैं",
+            "क्योंकि वे मूल्यह्रास का हिस्सा हैं"
+        ],
+        "options_en": [
+            "Because they are one-sided",
+            "Because they are related to exports",
+            "Because they are indirect taxes",
+            "Because they are part of depreciation"
+        ],
+        "answer": 0,
+        "explanation": "नोट्स में बताया गया है कि हस्तांतरण भुगतान राष्ट्रीय आय में शामिल नहीं किए जाते क्योंकि वे एकतरफा होते हैं और वस्तुओं या सेवाओं के उत्पादन का परिणाम नहीं होते।",
+        "explanation_en": "The notes explain that transfer payments are not included in national income because they are one-sided and do not result in the production of goods or services."
+    },
+    {
+        "q": "सार्वजनिक आय का प्राथमिक स्रोत क्या है?",
+        "q_en": "What is the primary source of public income?",
+        "options": [
+            "शुल्क",
+            "कर",
+            "दंड",
+            "विदेशी सहायता"
+        ],
+        "options_en": [
+            "Fees",
+            "Taxes",
+            "Fines",
+            "Foreign aid"
+        ],
+        "answer": 1,
+        "explanation": "नोट्स में करों को सार्वजनिक आय के प्राथमिक स्रोत के रूप में पहचाना गया है।",
+        "explanation_en": "The notes identify taxes as the primary source of public income."
+    },
+    {
+        "q": "व्यक्तिगत आय (PI) की गणना में क्या शामिल होता है?",
+        "q_en": "What is included in the calculation of Personal Income (PI)?",
+        "options": [
+            "केवल वेतन",
+            "कॉर्पोरेट आय कर",
+            "स्थानांतरण भुगतान",
+            "केवल निर्यात आय"
+        ],
+        "options_en": [
+            "Wages only",
+            "Corporate income tax",
+            "Transfer payments",
+            "Export income only"
+        ],
+        "answer": 2,
+        "explanation": "नोट्स में कहा गया है कि व्यक्तिगत आय में स्थानांतरण भुगतान के साथ-साथ वेतन, लाभांश आदि जैसे अन्य स्रोत शामिल होते हैं।",
+        "explanation_en": "The notes state that personal income includes transfer payments along with other sources like wages, dividends, etc."
+    },
+    {
+        "q": "नाममात्र जीडीपी और वास्तविक जीडीपी में मुख्य अंतर क्या है?",
+        "q_en": "What is the main difference between Nominal GDP and Real GDP?",
+        "options": [
+            "नाममात्र जीडीपी में मुद्रास्फीति समायोजित होती है",
+            "वास्तविक जीडीपी वर्तमान कीमतों पर आधारित है",
+            "नाममात्र जीडीपी वर्तमान कीमतों पर और वास्तविक जीडीपी आधार वर्ष की कीमतों पर आधारित है",
+            "दोनों में कोई अंतर नहीं है"
+        ],
+        "options_en": [
+            "Nominal GDP is adjusted for inflation",
+            "Real GDP is based on current prices",
+            "Nominal GDP is based on current prices and Real GDP on base-year prices",
+            "There is no difference between the two"
+        ],
+        "answer": 2,
+        "explanation": "नोट्स में बताया गया है कि नाममात्र जीडीपी वर्तमान कीमतों का उपयोग करती है, जबकि वास्तविक जीडीपी मुद्रास्फीति के लिए समायोजन करने के लिए आधार वर्ष की कीमतों का उपयोग करती है।",
+        "explanation_en": "The notes explain that nominal GDP uses current prices, while real GDP uses base-year prices to adjust for inflation."
+    },
+    {
+        "q": "जीडीपी डिफ्लेटर का उपयोग किसके लिए किया जाता है?",
+        "q_en": "What is the GDP Deflator used for?",
+        "options": [
+            "निर्यात और आयात की गणना",
+            "मुद्रास्फीति को मापने और वास्तविक जीडीपी की गणना",
+            "केवल आधार वर्ष की कीमतों की गणना",
+            "सरकारी खर्च को मापने"
+        ],
+        "options_en": [
+            "Calculating exports and imports",
+            "Measuring inflation and calculating Real GDP",
+            "Calculating base-year prices only",
+            "Measuring government spending"
+        ],
+        "answer": 1,
+        "explanation": "नोट्स में कहा गया है कि जीडीपी डिफ्लेटर मुद्रास्फीति को मापने और वास्तविक जीडीपी की गणना के लिए उपयोग किया जाता है।",
+        "explanation_en": "The notes state that the GDP deflator measures inflation and is used to calculate real GDP."
+    },
+    {
+        "q": "आधार वर्ष को संशोधित करने का एक कारण क्या है?",
+        "q_en": "What is one reason for revising the base year?",
+        "options": [
+            "निर्यात में कमी को मापने के लिए",
+            "अर्थव्यवस्था की संरचनात्मक परिवर्तनों को ध्यान में रखने के लिए",
+            "केवल कर संग्रह को बढ़ाने के लिए",
+            "विदेशी सहायता को मापने के लिए"
+        ],
+        "options_en": [
+            "To measure a decrease in exports",
+            "To account for structural changes in the economy",
+            "To increase tax collection only",
+            "To measure foreign aid"
+        ],
+        "answer": 1,
+        "explanation": "नोट्स में अर्थव्यवस्था में संरचनात्मक परिवर्तनों को प्रतिबिंबित करना आधार वर्ष को संशोधित करने के कारण के रूप में सूचीबद्ध है।",
+        "explanation_en": "The notes list reflecting structural changes in the economy as a reason for revising the base year."
+    },
+    {
+        "q": "शुद्ध राष्ट्रीय उत्पाद (NNP) और शुद्ध घरेलू उत्पाद (NDP) में क्या अंतर है?",
+        "q_en": "What is the difference between Net National Product (NNP) and Net Domestic Product (NDP)?",
+        "options": [
+            "NNP में विदेश से शुद्ध कारक आय शामिल होती है, NDP में नहीं",
+            "NDP में मूल्यह्रास शामिल होता है, NNP में नहीं",
+            "NNP केवल निर्यात पर आधारित है",
+            "दोनों में कोई अंतर नहीं है"
+        ],
+        "options_en": [
+            "NNP includes net factor income from abroad, NDP does not",
+            "NDP includes depreciation, NNP does not",
+            "NNP is based only on exports",
+            "There is no difference between the two"
+        ],
+        "answer": 0,
+        "explanation": "नोट्स में बताया गया है कि NNP = GDP + विदेश से शुद्ध कारक आय - मूल्यह्रास, जबकि NDP = GDP - मूल्यह्रास, इसलिए NNP में NFIA शामिल होता है, NDP में नहीं।",
+        "explanation_en": "The notes explain that NNP = GDP + Net Factor Income from Abroad - Depreciation, while NDP = GDP - Depreciation, so NNP includes NFIA, unlike NDP."
+    },
+    // Very Hard Questions (1-15)
+   
+    {
+        "q": "नाममात्र जीडीपी और वास्तविक जीडीपी में मुख्य अंतर क्या है?",
+        "q_en": "What is the main difference between Nominal GDP and Real GDP?",
+        "options": ["नाममात्र जीडीपी में मुद्रास्फीति समायोजित होती है", "वास्तविक जीडीपी वर्तमान कीमतों पर आधारित है", "नाममात्र जीडीपी वर्तमान कीमतों पर और वास्तविक जीडीपी आधार वर्ष की कीमतों पर आधारित है", "दोनों में कोई अंतर नहीं है"],
+        "options_en": ["Nominal GDP adjusts for inflation", "Real GDP is based on current prices", "Nominal GDP is based on current prices and Real GDP on base-year prices", "There is no difference between the two"],
+        "answer": 2,
+        "explanation": "नोट्स में बताया गया है कि नाममात्र जीडीपी वर्तमान कीमतों का उपयोग करती है, जबकि वास्तविक जीडीपी आधार वर्ष की कीमतों का उपयोग करके मुद्रास्फीति के लिए समायोजित करती है।",
+        "explanation_en": "The notes explain that nominal GDP uses current prices, while real GDP uses base-year prices to adjust for inflation."
+    },
+    {
+        "q": "जीडीपी डिफ्लेटर का उपयोग किसके लिए किया जाता है?",
+        "q_en": "What is the GDP Deflator used for?",
+        "options": ["निर्यात और आयात की गणना", "मुद्रास्फीति को मापने और वास्तविक जीडीपी की गणना", "केवल आधार वर्ष की कीमतों की गणना", "सरकारी खर्च को मापने"],
+        "options_en": ["Calculating exports and imports", "Measuring inflation and calculating real GDP", "Calculating only base-year prices", "Measuring government expenditure"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि जीडीपी डिफ्लेटर मुद्रास्फीति को मापता है और वास्तविक जीडीपी की गणना के लिए उपयोग किया जाता है।",
+        "explanation_en": "The notes state that the GDP deflator measures inflation and is used to calculate real GDP."
+    },
+    {
+        "q": "आधार वर्ष को संशोधित करने का एक कारण क्या है?",
+        "q_en": "What is one reason for revising the base year?",
+        "options": ["निर्यात में कमी को मापने के लिए", "अर्थव्यवस्था की संरचनात्मक परिवर्तनों को ध्यान में रखने के लिए", "केवल कर संग्रह को बढ़ाने के लिए", "विदेशी सहायता को मापने के लिए"],
+        "options_en": ["To measure a decrease in exports", "To account for structural changes in the economy", "To increase tax collection only", "To measure foreign aid"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि अर्थव्यवस्था में संरचनात्मक परिवर्तनों को प्रतिबिंबित करना आधार वर्ष को संशोधित करने का एक कारण है।",
+        "explanation_en": "The notes list reflecting structural changes in the economy as a reason for revising the base year."
+    },
+    {
+        "q": "शुद्ध राष्ट्रीय उत्पाद (NNP) और शुद्ध घरेलू उत्पाद (NDP) में क्या अंतर है?",
+        "q_en": "What is the difference between Net National Product (NNP) and Net Domestic Product (NDP)?",
+        "options": ["NNP में विदेश से शुद्ध कारक आय शामिल होती है, NDP में नहीं", "NDP में मूल्यह्रास शामिल होता है, NNP में नहीं", "NNP केवल निर्यात पर आधारित है", "दोनों में कोई अंतर नहीं है"],
+        "options_en": ["NNP includes net factor income from abroad, NDP does not", "NDP includes depreciation, NNP does not", "NNP is based only on exports", "There is no difference between the two"],
+        "answer": 0,
+        "explanation": "नोट्स में बताया गया है कि NNP = GDP + विदेश से शुद्ध कारक आय - मूल्यह्रास, जबकि NDP = GDP - मूल्यह्रास, इसलिए NNP में NFIA शामिल होता है, NDP में नहीं।",
+        "explanation_en": "The notes explain that NNP = GDP + Net Factor Income from Abroad - Depreciation, while NDP = GDP - Depreciation, so NNP includes NFIA, unlike NDP."
+    },
+    {
+        "q": "राष्ट्रीय आय की गणना में आय विधि क्या मापती है?",
+        "q_en": "What does the Income Method measure in the calculation of National Income?",
+        "options": ["केवल उपभोक्ता खर्च", "उत्पादन से उत्पन्न सभी आय का योग", "केवल सरकारी खर्च", "केवल निर्यात आय"],
+        "options_en": ["Only consumer expenditure", "The sum of all incomes generated from production", "Only government expenditure", "Only export income"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि आय विधि वस्तुओं और सेवाओं के उत्पादन से उत्पन्न सभी आय का योग करती है।",
+        "explanation_en": "The notes state that the income method sums all incomes generated from the production of goods and services."
+    },
+    {
+        "q": "बाजार मूल्य पर NDP की गणना कैसे की जाती है?",
+        "q_en": "How is NDP at Market Price calculated?",
+        "options": ["कारक लागत पर NDP + अप्रत्यक्ष कर - सब्सिडी", "कारक लागत पर NDP - अप्रत्यक्ष कर + सब्सिडी", "कारक लागत पर NDP + मूल्यह्रास", "कारक लागत पर NDP - मूल्यह्रास"],
+        "options_en": ["NDP at factor cost + indirect taxes - subsidies", "NDP at factor cost - indirect taxes + subsidies", "NDP at factor cost + depreciation", "NDP at factor cost - depreciation"],
+        "answer": 0,
+        "explanation": "नोट्स में उल्लेख है कि बाजार मूल्य पर NDP की गणना कारक लागत पर NDP में अप्रत्यक्ष कर जोड़कर और सब्सिडी घटाकर की जाती है।",
+        "explanation_en": "The notes specify that NDP at market price is calculated by adding indirect taxes and subtracting subsidies from NDP at factor cost."
+    },
+    {
+        "q": "वास्तविक जीडीपी का उपयोग क्यों किया जाता है?",
+        "q_en": "Why is Real GDP used?",
+        "options": ["वर्तमान कीमतों को मापने के लिए", "मुद्रास्फीति के प्रभाव को हटाकर वास्तविक वृद्धि को मापने के लिए", "केवल निर्यात को मापने के लिए", "केवल आयात को मापने के लिए"],
+        "options_en": ["To measure current prices", "To measure actual growth by removing the effect of inflation", "To measure only exports", "To measure only imports"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि वास्तविक जीडीपी मुद्रास्फीति के लिए समायोजित करके वास्तविक आर्थिक वृद्धि को मापता है।",
+        "explanation_en": "The notes highlight that real GDP adjusts for inflation to measure actual economic growth."
+    },
+    {
+        "q": "आधार वर्ष की एक विशेषता क्या है?",
+        "q_en": "What is one characteristic of a base year?",
+        "options": ["इसमें सूखा या महामारी जैसी असामान्य घटनाएँ होनी चाहिए", "यह सामान्य होना चाहिए और बहुत पुराना नहीं होना चाहिए", "यह केवल निर्यात पर आधारित होना चाहिए", "इसमें उच्च मुद्रास्फीति होनी चाहिए"],
+        "options_en": ["It should have unusual events like drought or pandemic", "It should be normal and not too old", "It should be based only on exports", "It should have high inflation"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि आधार वर्ष सामान्य होना चाहिए, जिसमें असामान्य घटनाएँ न हों, और यह बहुत पुराना नहीं होना चाहिए।",
+        "explanation_en": "The notes state that the base year should be normal, without unusual events, and not too far in the past."
+    },
+    {
+        "q": "SDDS का उद्देश्य क्या है?",
+        "q_en": "What is the purpose of SDDS?",
+        "options": ["केवल कर संग्रह को बढ़ाना", "डेटा पारदर्शिता बढ़ाना और आर्थिक स्थिति का आकलन प्रदान करना", "केवल निर्यात डेटा साझा करना", "केवल विदेशी सहायता को ट्रैक करना"],
+        "options_en": ["To increase tax collection only", "To enhance data transparency and provide economic assessment", "To share only export data", "To track only foreign aid"],
+        "answer": 1,
+        "explanation": "नोट्स में SDDS को डेटा पारदर्शिता बढ़ाने और आर्थिक जानकारी प्रदान करने के लिए एक ढांचे के रूप में वर्णित किया गया है।",
+        "explanation_en": "The notes describe SDDS as a framework to enhance data transparency and provide economic information."
+    },
+    {
+        "q": "नाममात्र जीडीपी में क्या शामिल होता है?",
+        "q_en": "What is included in Nominal GDP?",
+        "options": ["केवल आधार वर्ष की कीमतें", "वर्तमान कीमतों पर सभी वस्तुओं और सेवाओं का मूल्य", "केवल मुद्रास्फीति समायोजित मूल्य", "केवल सब्सिडी"],
+        "options_en": ["Only base-year prices", "The value of all goods and services at current prices", "Only inflation-adjusted prices", "Only subsidies"],
+        "answer": 1,
+        "explanation": "नोट्स में नाममात्र जीडीपी को वर्तमान कीमतों पर सभी वस्तुओं और सेवाओं के मूल्य के रूप में परिभाषित किया गया है।",
+        "explanation_en": "The notes define nominal GDP as the value of all goods and services at current prices."
+    },
+    {
+        "q": "राष्ट्रीय आय में हस्तांतरण भुगतान क्यों नहीं शामिल किए जाते?",
+        "q_en": "Why are transfer payments not included in National Income?",
+        "options": ["क्योंकि वे उत्पादन से संबंधित नहीं हैं", "क्योंकि वे निर्यात का हिस्सा हैं", "क्योंकि वे अप्रत्यक्ष कर हैं", "क्योंकि वे मूल्यह्रास का हिस्सा हैं"],
+        "options_en": ["Because they are not related to production", "Because they are part of exports", "Because they are indirect taxes", "Because they are part of depreciation"],
+        "answer": 0,
+        "explanation": "नोट्स में स्पष्ट किया गया है कि हस्तांतरण भुगतान शामिल नहीं किए जाते क्योंकि वे वस्तुओं या सेवाओं के उत्पादन से संबंधित नहीं हैं।",
+        "explanation_en": "The notes clarify that transfer payments are excluded because they do not involve the production of goods or services."
+    },
+    {
+        "q": "कारक लागत में क्या शामिल होता है?",
+        "q_en": "What is included in Factor Cost?",
+        "options": ["अप्रत्यक्ष कर और सब्सिडी", "श्रम, पूंजी, भूमि और परिवहन की लागत", "केवल निर्यात की लागत", "केवल आयात की लागत"],
+        "options_en": ["Indirect taxes and subsidies", "Costs of labor, capital, land, and transportation", "Only the cost of exports", "Only the cost of imports"],
+        "answer": 1,
+        "explanation": "नोट्स में श्रम, पूंजी, भूमि, कच्चे माल, परिवहन और सब्सिडी को कारक लागत के घटकों के रूप में सूचीबद्ध किया गया है।",
+        "explanation_en": "The notes list labor, capital, land, raw materials, transportation, and subsidies as components of factor cost."
+    },
+    {
+        "q": "वास्तविक जीडीपी की गणना में आधार वर्ष की कीमतों का उपयोग क्यों किया जाता है?",
+        "q_en": "Why are base-year prices used in calculating Real GDP?",
+        "options": ["मुद्रास्फीति को बढ़ाने के लिए", "कीमतों को स्थिर रखने और वास्तविक वृद्धि को मापने के लिए", "निर्यात को बढ़ाने के लिए", "आयात को कम करने के लिए"],
+        "options_en": ["To increase inflation", "To keep prices constant and measure real growth", "To increase exports", "To reduce imports"],
+        "answer": 1,
+        "explanation": "नोट्स में बताया गया है कि वास्तविक जीडीपी आधार वर्ष की कीमतों का उपयोग करती है ताकि मुद्रास्फीति के प्रभाव को समाप्त करके वास्तविक वृद्धि को मापा जा सके।",
+        "explanation_en": "The notes explain that real GDP uses base-year prices to eliminate inflation effects and measure actual growth."
+    },
+    {
+        "q": "आधार वर्ष को हर 5 से 10 साल में संशोधित करने की सलाह क्यों दी जाती है?",
+        "q_en": "Why is it recommended to revise the base year every 5 to 10 years?",
+        "options": ["निर्यात को बढ़ाने के लिए", "नवीनतम आर्थिक डेटा के साथ तालमेल बनाए रखने के लिए", "केवल कर संग्रह को मापने के लिए", "केवल विदेशी सहायता को ट्रैक करने के लिए"],
+        "options_en": ["To increase exports", "To keep pace with the latest economic data", "To measure only tax collection", "To track only foreign aid"],
+        "answer": 1,
+        "explanation": "नोट्स में सुझाव दिया गया है कि आधार वर्ष को हर 5-10 साल में संशोधित करना नवीनतम आर्थिक डेटा के साथ तालमेल बनाए रखने के लिए आवश्यक है।",
+        "explanation_en": "The notes recommend revising the base year every 5–10 years to align with the latest economic data."
+    },
+    {
+        "q": "शुद्ध घरेलू उत्पाद (NDP) का उपयोग क्या दर्शाता है?",
+        "q_en": "What does Net Domestic Product (NDP) indicate?",
+        "options": ["कुल निर्यात मूल्य", "मूल्यह्रास को हटाकर अर्थव्यवस्था में उत्पादन का मूल्य", "केवल सरकारी खर्च", "केवल उपभोक्ता खर्च"],
+        "options_en": ["Total export value", "The value of production in the economy after removing depreciation", "Only government expenditure", "Only consumer expenditure"],
+        "answer": 1,
+        "explanation": "नोट्स में NDP को GDP माइनस मूल्यह्रास के रूप में परिभाषित किया गया है, जो उत्पादन का शुद्ध मूल्य दर्शाता है।",
+        "explanation_en": "The notes define NDP as GDP minus depreciation, reflecting the net value of production."
+    },
+    {
+        "q": "राष्ट्रीय आय को मापने की व्यय विधि में क्या शामिल होता है?",
+        "q_en": "What is included in the Expenditure Method for measuring National Income?",
+        "options": ["केवल आयात", "C + I + G + (X - M)", "केवल मूल्यह्रास", "केवल सब्सिडी"],
+        "options_en": ["Only imports", "C + I + G + (X - M)", "Only depreciation", "Only subsidies"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि व्यय विधि में उपभोग (C), निवेश (I), सरकारी खर्च (G), और शुद्ध निर्यात (X - M) शामिल हैं।",
+        "explanation_en": "The notes specify that the expenditure method includes consumption (C), investment (I), government spending (G), and net exports (X - M)."
+    },
+    {
+        "q": "2015 में भारत में राष्ट्रीय आय की गणना में क्या बदलाव हुआ?",
+        "q_en": "What change occurred in India’s National Income calculation in 2015?",
+        "options": ["आधार वर्ष को 2012 से 2005 में बदला गया", "गणना पद्धति को कारक लागत से सकल मूल्य वर्धित (GVA) में बदला गया", "केवल निर्यात पर आधारित गणना शुरू की गई", "गणना को पूरी तरह बंद कर दिया गया"],
+        "options_en": ["The base year was changed from 2012 to 2005", "The calculation method was changed from factor cost to gross value added (GVA)", "Calculation based only on exports was introduced", "The calculation was completely stopped"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि जनवरी 2015 में, भारत के CSO ने गणना पद्धति को कारक लागत से GVA में बदला।",
+        "explanation_en": "The notes mention that in January 2015, India’s CSO changed the calculation method from factor cost to GVA."
+    },
+    {
+        "q": "बाजार मूल्य का उपयोग किसके लिए किया जाता है?",
+        "q_en": "What is market price used for?",
+        "options": ["केवल सब्सिडी की गणना", "वित्तीय बाजार में परिसंपत्ति या कंपनी के मूल्य का आकलन", "केवल मूल्यह्रास की गणना", "केवल निर्यात की गणना"],
+        "options_en": ["Calculating only subsidies", "Assessing the value of an asset or company in the financial market", "Calculating only depreciation", "Calculating only exports"],
+        "answer": 1,
+        "explanation": "नोट्स में बाजार मूल्य को वित्तीय बाजार में परिसंपत्ति या कंपनी के मूल्य के रूप में परिभाषित किया गया है।",
+        "explanation_en": "The notes define market price as the value of an asset or company in the financial market."
+    },
+    {
+        "q": "सार्वजनिक आय में अनुदान और उपहार का स्रोत क्या है?",
+        "q_en": "What is the source of grants and gifts in public income?",
+        "options": ["व्यक्तियों या संगठनों द्वारा सरकार को दिया गया धन", "केवल कर संग्रह", "केवल निर्यात आय", "केवल आयात शुल्क"],
+        "options_en": ["Money given to the government by individuals or organizations", "Only tax collection", "Only export income", "Only import duties"],
+        "answer": 0,
+        "explanation": "नोट्स में अनुदान और उपहार को व्यक्तियों या संगठनों द्वारा सरकार को प्रदान किए गए धन के रूप में सूचीबद्ध किया गया है।",
+        "explanation_en": "The notes list grants and gifts as funds provided to the government by individuals or organizations."
+    },
+    {
+        "q": "व्यक्तिगत आय में स्थानांतरण भुगतान क्यों शामिल किए जाते हैं?",
+        "q_en": "Why are transfer payments included in Personal Income?",
+        "options": ["क्योंकि वे उत्पादन से संबंधित हैं", "क्योंकि वे व्यक्तियों की कुल आय का हिस्सा हैं", "क्योंकि वे अप्रत्यक्ष कर हैं", "क्योंकि वे मूल्यह्रास का हिस्सा हैं"],
+        "options_en": ["Because they are related to production", "Because they are part of individuals’ total income", "Because they are indirect taxes", "Because they are part of depreciation"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि व्यक्तिगत आय में हस्तांतरण भुगतान शामिल किए जाते हैं क्योंकि वे व्यक्तियों द्वारा प्राप्त कुल आय का हिस्सा हैं।",
+        "explanation_en": "The notes state that personal income includes transfer payments as part of the total income received by individuals."
+    },
+    {
+        "q": "राष्ट्रीय आय में आयात क्यों शामिल नहीं होता?",
+        "q_en": "Why are imports not included in National Income?",
+        "options": ["क्योंकि वे उत्पादन का हिस्सा नहीं हैं", "क्योंकि वे निर्यात का हिस्सा हैं", "क्योंकि वे अप्रत्यक्ष कर हैं", "क्योंकि वे मूल्यह्रास का हिस्सा हैं"],
+        "options_en": ["Because they are not part of production", "Because they are part of exports", "Because they are indirect taxes", "Because they are part of depreciation"],
+        "answer": 0,
+        "explanation": "नोट्स में स्पष्ट किया गया है कि आयात जीडीपी या राष्ट्रीय आय का हिस्सा नहीं हैं क्योंकि वे घरेलू उत्पादन नहीं हैं।",
+        "explanation_en": "The notes clarify that imports are not part of GDP or national income as they are not produced domestically."
+    },
+    {
+        "q": "शुद्ध निर्यात (X - M) का क्या अर्थ है?",
+        "q_en": "What does Net Exports (X - M) mean?",
+        "options": ["निर्यात और आयात का योग", "निर्यात से आयात घटाने पर प्राप्त राशि", "केवल निर्यात की राशि", "केवल आयात की राशि"],
+        "options_en": ["The sum of exports and imports", "The amount obtained by subtracting imports from exports", "Only the amount of exports", "Only the amount of imports"],
+        "answer": 1,
+        "explanation": "नोट्स में शुद्ध निर्यात को निर्यात माइनस आयात (X - M) के रूप में परिभाषित किया गया है।",
+        "explanation_en": "The notes define net exports as exports minus imports (X - M)."
+    },
+    {
+        "q": "आधार वर्ष में असामान्य घटनाओं से बचने का कारण क्या है?",
+        "q_en": "Why should the base year avoid unusual events?",
+        "options": ["निर्यात को बढ़ाने के लिए", "आर्थिक प्रदर्शन की सटीक तुलना के लिए", "केवल कर संग्रह को मापने के लिए", "केवल विदेशी सहायता को ट्रैक करने के लिए"],
+        "options_en": ["To increase exports", "For accurate comparison of economic performance", "To measure only tax collection", "To track only foreign aid"],
+        "answer": 1,
+        "explanation": "नोट्स में जोर दिया गया है कि आधार वर्ष सामान्य होना चाहिए ताकि आर्थिक प्रदर्शन की सटीक तुलना सुनिश्चित हो सके।",
+        "explanation_en": "The notes emphasize that the base year should be normal to ensure accurate comparisons of economic performance."
+    },
+    {
+        "q": "SDDS में कितनी डेटा श्रेणियाँ शामिल हैं?",
+        "q_en": "How many data categories are included in SDDS?",
+        "options": ["10 से अधिक", "15 से अधिक", "20 से अधिक", "5 से अधिक"],
+        "options_en": ["More than 10", "More than 15", "More than 20", "More than 5"],
+        "answer": 2,
+        "explanation": "नोट्स में उल्लेख है कि SDDS में 20 से अधिक डेटा श्रेणियाँ शामिल हैं, जैसे राष्ट्रीय खाते, उत्पादन सूचकांक, और रोजगार।",
+        "explanation_en": "The notes mention that SDDS includes over 20 data categories, such as national accounts, production indices, and employment."
+    },
+    {
+        "q": "राष्ट्रीय आय में कॉर्पोरेट आय कर क्यों घटाया जाता है?",
+        "q_en": "Why is corporate income tax subtracted in National Income?",
+        "options": ["क्योंकि यह व्यक्तिगत आय का हिस्सा है", "क्योंकि यह राष्ट्रीय आय का हिस्सा नहीं है", "क्योंकि यह निर्यात का हिस्सा है", "क्योंकि यह मूल्यह्रास का हिस्सा है"],
+        "options_en": ["Because it is part of personal income", "Because it is not part of national income", "Because it is part of exports", "Because it is part of depreciation"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि कॉर्पोरेट आय कर को व्यक्तिगत आय की गणना में घटाया जाता है, क्योंकि यह व्यक्तियों को वितरित आय का हिस्सा नहीं है।",
+        "explanation_en": "The notes indicate that corporate income tax is subtracted in personal income calculations, as it is not part of the income distributed to individuals."
+    },
+    {
+        "q": "यदि नाममात्र जीडीपी बढ़ रही है, लेकिन वास्तविक जीडीपी स्थिर है, तो इसका क्या अर्थ है?",
+        "q_en": "If Nominal GDP is increasing but Real GDP is stable, what does it imply?",
+        "options": ["अर्थव्यवस्था में कोई वृद्धि नहीं हो रही", "मुद्रास्फीति बढ़ रही है", "निर्यात बढ़ रहा है", "आयात बढ़ रहा है"],
+        "options_en": ["The economy is not growing", "Inflation is increasing", "Exports are increasing", "Imports are increasing"],
+        "answer": 1,
+        "explanation": "नोट्स में बताया गया है कि नाममात्र जीडीपी वर्तमान कीमतों को दर्शाती है, इसलिए यदि यह बढ़ रही है जबकि वास्तविक जीडीपी (मुद्रास्फीति के लिए समायोजित) स्थिर है, तो यह बढ़ती मुद्रास्फीति को दर्शाता है।",
+        "explanation_en": "The notes explain that nominal GDP reflects current prices, so if it increases while real GDP (adjusted for inflation) remains stable, it indicates rising inflation."
+    },
+    {
+        "q": "यदि जीडीपी डिफ्लेटर 125 है, तो इसका क्या अर्थ है?",
+        "q_en": "If the GDP Deflator is 125, what does it mean?",
+        "options": ["वास्तविक जीडीपी नाममात्र जीडीपी से 25% अधिक है", "कीमतें आधार वर्ष की तुलना में 25% बढ़ी हैं", "निर्यात 25% बढ़ा है", "आयात 25% बढ़ा है"],
+        "options_en": ["Real GDP is 25% higher than nominal GDP", "Prices have increased by 25% compared to the base year", "Exports have increased by 25%", "Imports have increased by 25%"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि जीडीपी डिफ्लेटर मूल्य परिवर्तनों को मापता है। 125 का डिफ्लेटर इसका मतलब है कि आधार वर्ष की तुलना में कीमतें 25% बढ़ी हैं।",
+        "explanation_en": "The notes state that the GDP deflator measures price changes. A deflator of 125 means prices have increased by 25% since the base year."
+    },
+    {
+        "q": "यदि आधार वर्ष बहुत पुराना है, तो क्या समस्या हो सकती है?",
+        "q_en": "If the base year is too old, what could be the problem?",
+        "options": ["यह निर्यात को कम करेगा", "यह आर्थिक प्रदर्शन की गलत तुलना करेगा", "यह कर संग्रह को बढ़ाएगा", "यह विदेशी सहायता को कम करेगा"],
+        "options_en": ["It will reduce exports", "It will lead to inaccurate comparison of economic performance", "It will increase tax collection", "It will reduce foreign aid"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि पुराना आधार वर्ष वर्तमान आर्थिक संरचनाओं को प्रतिबिंबित नहीं कर सकता, जिससे तुलना गलत हो सकती है।",
+        "explanation_en": "The notes highlight that an outdated base year may not reflect current economic structures, leading to inaccurate comparisons."
+    },
+    {
+        "q": "हस्तांतरण भुगतान व्यक्तिगत आय में शामिल हैं, लेकिन राष्ट्रीय आय में नहीं। इसका कारण क्या है?",
+        "q_en": "Transfer payments are included in Personal Income but not in National Income. Why?",
+        "options": ["क्योंकि वे उत्पादन से संबंधित हैं", "क्योंकि वे संसाधनों का हस्तांतरण हैं, उत्पादन नहीं", "क्योंकि वे निर्यात का हिस्सा हैं", "क्योंकि वे अप्रत्यक्ष कर हैं"],
+        "options_en": ["Because they are related to production", "Because they are transfers of resources, not production", "Because they are part of exports", "Because they are indirect taxes"],
+        "answer": 1,
+        "explanation": "नोट्स में स्पष्ट किया गया है कि हस्तांतरण भुगतान राष्ट्रीय आय का हिस्सा नहीं हैं क्योंकि वे संसाधनों का हस्तांतरण हैं, उत्पादन से संबंधित नहीं, लेकिन व्यक्तिगत आय में शामिल हैं।",
+        "explanation_en": "The notes clarify that transfer payments are not part of national income because they are resource transfers, not payments for production, but they are included in personal income."
+    },
+    {
+        "q": "यदि NDP > GDP है, तो इसका क्या अर्थ है?",
+        "q_en": "If NDP > GDP, what does it imply?",
+        "options": ["मूल्यह्रास नकारात्मक है", "अप्रत्यक्ष कर नकारात्मक हैं", "सब्सिडी नकारात्मक है", "यह संभव नहीं है"],
+        "options_en": ["Depreciation is negative", "Indirect taxes are negative", "Subsidies are negative", "It is not possible"],
+        "answer": 3,
+        "explanation": "नोट्स में उल्लेख है कि NDP = GDP - मूल्यह्रास। चूंकि मूल्यह्रास हमेशा सकारात्मक या शून्य होता है, इसलिए NDP का GDP से अधिक होना संभव नहीं है।",
+        "explanation_en": "The notes state that NDP = GDP - Depreciation. Since depreciation is always positive or zero, NDP cannot be greater than GDP."
+    },
+    {
+        "q": "यदि अप्रत्यक्ष कर शून्य हैं और सब्सिडी शून्य हैं, तो कारक लागत पर जीडीपी और बाजार मूल्य पर जीडीपी में क्या संबंध होगा?",
+        "q_en": "If indirect taxes and subsidies are zero, what is the relationship between GDP at factor cost and GDP at market price?",
+        "options": ["कारक लागत पर जीडीपी > बाजार मूल्य पर जीडीपी", "कारक लागत पर जीडीपी = बाजार मूल्य पर जीडीपी", "कारक लागत पर जीडीपी < बाजार मूल्य पर जीडीपी", "कोई संबंध नहीं"],
+        "options_en": ["GDP at factor cost > GDP at market price", "GDP at factor cost = GDP at market price", "GDP at factor cost < GDP at market price", "No relationship"],
+        "answer": 1,
+        "explanation": "नोट्स में सूत्र दिया गया है: बाजार मूल्य पर जीडीपी = कारक लागत पर जीडीपी + अप्रत्यक्ष कर - सब्सिडी। यदि कर और सब्सिडी दोनों शून्य हैं, तो दोनों जीडीपी बराबर होंगे।",
+        "explanation_en": "The notes provide the formula: GDP at market price = GDP at factor cost + indirect taxes - subsidies. If both taxes and subsidies are zero, the two GDPs are equal."
+    },
+    {
+        "q": "नाममात्र जीडीपी का उपयोग ऋण विश्लेषण में क्यों किया जाता है?",
+        "q_en": "Why is Nominal GDP used in debt analysis?",
+        "options": ["क्योंकि यह मुद्रास्फीति को समायोजित करता है", "क्योंकि यह मुद्रास्फीति से प्रभावित नहीं होता", "क्योंकि यह आधार वर्ष की कीमतों पर आधारित है", "क्योंकि यह केवल निर्यात को मापता है"],
+        "options_en": ["Because it adjusts for inflation", "Because it is not affected by inflation", "Because it is based on base-year prices", "Because it measures only exports"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि नाममात्र जीडीपी का उपयोग ऋण विश्लेषण जैसे कारकों के लिए किया जाता है क्योंकि यह वर्तमान कीमतों को दर्शाता है, जो मुद्रास्फीति समायोजन से प्रभावित नहीं होता।",
+        "explanation_en": "The notes state that nominal GDP is used for factors like debt analysis because it reflects current prices, unaffected by inflation adjustments."
+    },
+    {
+        "q": "यदि वास्तविक जीडीपी घट रही है, लेकिन नाममात्र जीडीपी बढ़ रही है, तो इसका क्या अर्थ है?",
+        "q_en": "If Real GDP is decreasing but Nominal GDP is increasing, what does it imply?",
+        "options": ["अर्थव्यवस्था बढ़ रही है", "मुद्रास्फीति बढ़ रही है", "निर्यात घट रहा है", "आयात बढ़ रहा है"],
+        "options_en": ["The economy is growing", "Inflation is increasing", "Exports are decreasing", "Imports are increasing"],
+        "answer": 1,
+        "explanation": "नोट्स में बताया गया है कि वास्तविक जीडीपी (मुद्रास्फीति के लिए समायोजित) में कमी और नाममात्र जीडीपी (वर्तमान कीमतों) में वृद्धि बढ़ती मुद्रास्फीति को दर्शाती है।",
+        "explanation_en": "The notes explain that a decrease in real GDP (adjusted for inflation) with an increase in nominal GDP (current prices) indicates rising inflation."
+    },
+    {
+        "q": "आधार वर्ष को संशोधित करने से निवेशकों का विश्वास कैसे बढ़ता है?",
+        "q_en": "How does revising the base year increase investor confidence?",
+        "options": ["यह निर्यात को बढ़ाता है", "यह पारदर्शी और सटीक डेटा प्रदान करता है", "यह कर संग्रह को कम करता है", "यह आयात को बढ़ाता है"],
+        "options_en": ["It increases exports", "It provides transparent and accurate data", "It reduces tax collection", "It increases imports"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि आधार वर्ष को संशोधित करने से डेटा की सटीकता और पारदर्शिता में सुधार होता है, जो निवेशकों के विश्वास को बढ़ाता है।",
+        "explanation_en": "The notes mention that revising the base year improves data accuracy and transparency, which boosts investor confidence."
+    },
+    {
+        "q": "यदि मूल्यह्रास शून्य है, तो GDP और NDP में क्या संबंध होगा?",
+        "q_en": "If depreciation is zero, what is the relationship between GDP and NDP?",
+        "options": ["GDP > NDP", "GDP = NDP", "GDP < NDP", "कोई संबंध नहीं"],
+        "options_en": ["GDP > NDP", "GDP = NDP", "GDP < NDP", "No relationship"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि NDP = GDP - मूल्यह्रास। यदि मूल्यह्रास शून्य है, तो GDP और NDP बराबर होंगे।",
+        "explanation_en": "The notes state that NDP = GDP - Depreciation. If depreciation is zero, GDP equals NDP."
+    },
+    {
+        "q": "यदि कोई देश अपनी राष्ट्रीय आय की गणना केवल व्यय विधि से करता है, तो क्या यह सटीक होगा?",
+        "q_en": "If a country calculates its National Income using only the Expenditure Method, will it be accurate?",
+        "options": ["हाँ, क्योंकि यह सभी खर्चों को शामिल करता है", "नहीं, क्योंकि अन्य विधियाँ अलग-अलग दृष्टिकोण प्रदान करती हैं", "हाँ, क्योंकि यह सबसे सरल विधि है", "नहीं, क्योंकि यह निर्यात को शामिल नहीं करता"],
+        "options_en": ["Yes, because it includes all expenditures", "No, because other methods provide different perspectives", "Yes, because it is the simplest method", "No, because it does not include exports"],
+        "answer": 1,
+        "explanation": "नोट्स में राष्ट्रीय आय की गणना के लिए तीन विधियों (आय, उत्पाद, व्यय) को सूचीबद्ध किया गया है, प्रत्येक अलग-अलग दृष्टिकोण प्रदान करती है ताकि सटीकता सुनिश्चित हो। केवल एक विधि पर निर्भर रहने से अन्य विधियों द्वारा प्राप्त सूक्ष्मताएँ छूट सकती हैं।",
+        "explanation_en": "The notes list three methods (income, product, expenditure) for calculating national income, each providing a different perspective to ensure accuracy. Relying on one method may miss nuances captured by others."
+    },
+    {
+        "q": "आधार वर्ष को बहुत पुराना रखने से आर्थिक विश्लेषण में क्या समस्या हो सकती है?",
+        "q_en": "What problem might arise in economic analysis if the base year is kept too old?",
+        "options": ["यह निर्यात को कम करेगा", "यह अर्थव्यवस्था की वर्तमान संरचना को प्रतिबिंबित नहीं करेगा", "यह कर संग्रह को बढ़ाएगा", "यह विदेशी सहायता को कम करेगा"],
+        "options_en": ["It will reduce exports", "It will not reflect the current structure of the economy", "It will increase tax collection", "It will reduce foreign aid"],
+        "answer": 1,
+        "explanation": "नोट्स में जोर दिया गया है कि पुराना आधार वर्ष वर्तमान आर्थिक संरचनाओं को प्रतिबिंबित करने में विफल रहता है, जिससे विश्लेषण गलत हो सकता है।",
+        "explanation_en": "The notes emphasize that an outdated base year fails to reflect current economic structures, leading to inaccurate analysis."
+    },
+    {
+        "q": "हस्तांतरण भुगतान को व्यक्तिगत आय में शामिल करने का तर्क क्या है?",
+        "q_en": "What is the rationale for including transfer payments in Personal Income?",
+        "options": ["क्योंकि वे उत्पादन से संबंधित हैं", "क्योंकि वे व्यक्तियों की कुल आय का हिस्सा हैं", "क्योंकि वे निर्यात का हिस्सा हैं", "क्योंकि वे अप्रत्यक्ष कर हैं"],
+        "options_en": ["Because they are related to production", "Because they are part of individuals’ total income", "Because they are part of exports", "Because they are indirect taxes"],
+        "answer": 1,
+        "explanation": "नोट्स में बताया गया है कि हस्तांतरण भुगतान व्यक्तिगत आय में शामिल किए जाते हैं क्योंकि वे व्यक्तियों द्वारा प्राप्त कुल आय में योगदान करते हैं, भले ही वे उत्पादन से संबंधित न हों।",
+        "explanation_en": "The notes explain that transfer payments are included in personal income because they contribute to the total income received by individuals, even though they are not tied to production."
+    },
+    {
+        "q": "राष्ट्रीय आय में आयात को शामिल न करने का तर्क क्या है?",
+        "q_en": "What is the rationale for not including imports in National Income?",
+        "options": ["क्योंकि वे विदेशी उत्पादन का हिस्सा हैं", "क्योंकि वे निर्यात का हिस्सा हैं", "क्योंकि वे अप्रत्यक्ष कर हैं", "क्योंकि वे मूल्यह्रास का हिस्सा हैं"],
+        "options_en": ["Because they are part of foreign production", "Because they are part of exports", "Because they are indirect taxes", "Because they are part of depreciation"],
+        "answer": 0,
+        "explanation": "नोट्स में उल्लेख है कि आयात राष्ट्रीय आय का हिस्सा नहीं हैं क्योंकि वे विदेशी उत्पादन का प्रतिनिधित्व करते हैं, न कि घरेलू।",
+        "explanation_en": "The notes state that imports are not part of national income because they represent foreign production, not domestic."
+    },
+    {
+        "q": "SDDS में शामिल होने से भारत को क्या लाभ हुआ?",
+        "q_en": "What benefit did India gain from joining SDDS?",
+        "options": ["निर्यात में वृद्धि", "डेटा पारदर्शिता और अंतरराष्ट्रीय तुलना में सुधार", "कर संग्रह में कमी", "आयात में वृद्धि"],
+        "options_en": ["Increase in exports", "Improved data transparency and international comparison", "Reduction in tax collection", "Increase in imports"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि SDDS डेटा पारदर्शिता को बढ़ाता है और अंतरराष्ट्रीय तुलनाओं को सुगम बनाता है, जिससे भारत की आर्थिक विश्वसनीयता में लाभ हुआ।",
+        "explanation_en": "The notes highlight that SDDS enhances data transparency and facilitates international comparisons, benefiting India’s economic credibility."
+    },
+    {
+        "q": "कारक लागत पर जीडीपी को प्राथमिकता देने का कारण क्या हो सकता है?",
+        "q_en": "Why might GDP at Factor Cost be preferred?",
+        "options": ["क्योंकि यह निर्यात को मापता है", "क्योंकि यह उत्पादन की वास्तविक लागत को दर्शाता है", "क्योंकि यह मुद्रास्फीति को शामिल करता है", "क्योंकि यह आयात को मापता है"],
+        "options_en": ["Because it measures exports", "Because it reflects the actual cost of production", "Because it includes inflation", "Because it measures imports"],
+        "answer": 1,
+        "explanation": "नोट्स में कारक लागत को उत्पादन इनपुट की वास्तविक लागत को दर्शाने के रूप में परिभाषित किया गया है, जो उत्पादन लागत को समझने के लिए उपयोगी है।",
+        "explanation_en": "The notes define factor cost as reflecting the actual cost of production inputs, making it a useful measure for understanding production costs."
+    },
+    {
+        "q": "मूल्यह्रास को NDP की गणना में क्यों घटाया जाता है?",
+        "q_en": "Why is depreciation subtracted in the calculation of NDP?",
+        "options": ["क्योंकि यह निर्यात का हिस्सा है", "क्योंकि यह पूंजी के उपयोग की हानि को दर्शाता है", "क्योंकि यह अप्रत्यक्ष कर है", "क्योंकि यह सब्सिडी है"],
+        "options_en": ["Because it is part of exports", "Because it reflects the loss in value of capital due to use", "Because it is an indirect tax", "Because it is a subsidy"],
+        "answer": 1,
+        "explanation": "नोट्स में मूल्यह्रास को पूंजी के उपयोग के कारण मूल्य में हानि के रूप में वर्णित किया गया है, जिसे NDP की गणना के लिए घटाया जाता है।",
+        "explanation_en": "The notes describe depreciation as the loss in value of capital due to use, which is subtracted to calculate NDP."
+    },
+    {
+        "q": "वास्तविक जीडीपी का उपयोग आर्थिक वृद्धि को मापने में क्यों महत्वपूर्ण है?",
+        "q_en": "Why is Real GDP important for measuring economic growth?",
+        "options": ["क्योंकि यह निर्यात को मापता है", "क्योंकि यह मुद्रास्फीति के प्रभाव को हटाता है", "क्योंकि यह केवल वर्तमान कीमतों को मापता है", "क्योंकि यह आयात को मापता है"],
+        "options_en": ["Because it measures exports", "Because it removes the effect of inflation", "Because it measures only current prices", "Because it measures imports"],
+        "answer": 1,
+        "explanation": "नोट्स में जोर दिया गया है कि वास्तविक जीडीपी मुद्रास्फीति के लिए समायोजित करता है, जिससे आर्थिक वृद्धि का सटीक माप मिलता है।",
+        "explanation_en": "The notes emphasize that real GDP adjusts for inflation, providing a true measure of economic growth."
+    },
+    {
+        "q": "आधार वर्ष को संशोधित करने से नीति निर्माण में कैसे सुधार होता है?",
+        "q_en": "How does revising the base year improve policymaking?",
+        "options": ["यह निर्यात को बढ़ाता है", "यह सटीक जीडीपी डेटा प्रदान करता है", "यह कर संग्रह को कम करता है", "यह आयात को बढ़ाता है"],
+        "options_en": ["It increases exports", "It provides accurate GDP data", "It reduces tax collection", "It increases imports"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि आधार वर्ष को संशोधित करने से सटीक जीडीपी डेटा मिलता है, जिससे बेहतर लक्षित नीतियाँ बनाने में मदद मिलती है।",
+        "explanation_en": "The notes state that revising the base year provides accurate GDP data, aiding better-targeted policies."
+    },
+    {
+        "q": "राष्ट्रीय आय में कॉर्पोरेट आय कर को क्यों नहीं शामिल किया जाता?",
+        "q_en": "Why is corporate income tax not included in National Income?",
+        "options": ["क्योंकि यह व्यक्तिगत आय का हिस्सा है", "क्योंकि यह उत्पादन से उत्पन्न आय का हिस्सा नहीं है", "क्योंकि यह निर्यात का हिस्सा है", "क्योंकि यह मूल्यह्रास का हिस्सा है"],
+        "options_en": ["Because it is part of personal income", "Because it is not part of income generated from production", "Because it is part of exports", "Because it is part of depreciation"],
+        "answer": 1,
+        "explanation": "नोट्स में स्पष्ट किया गया है कि कॉर्पोरेट आय कर राष्ट्रीय आय का हिस्सा नहीं है क्योंकि यह उत्पादन से उत्पन्न आय नहीं है।",
+        "explanation_en": "The notes clarify that corporate income tax is not part of national income as it is not income generated from production."
+    },
+    {
+        "q": "शुद्ध निर्यात (X - M) जीडीपी का हिस्सा क्यों है?",
+        "q_en": "Why are Net Exports (X - M) part of GDP?",
+        "options": ["क्योंकि वे आयात को मापते हैं", "क्योंकि वे देश के उत्पादन का हिस्सा हैं", "क्योंकि वे अप्रत्यक्ष कर हैं", "क्योंकि वे मूल्यह्रास का हिस्सा हैं"],
+        "options_en": ["Because they measure imports", "Because they are part of the country’s production", "Because they are indirect taxes", "Because they are part of depreciation"],
+        "answer": 1,
+        "explanation": "नोट्स में बताया गया है कि शुद्ध निर्यात (निर्यात माइनस आयात) विदेश में बेचे गए घरेलू उत्पादन को दर्शाता है, जो जीडीपी का हिस्सा है।",
+        "explanation_en": "The notes explain that net exports (exports minus imports) reflect domestic production sold abroad, making them part of GDP."
+    },
+    {
+        "q": "नाममात्र जीडीपी का उपयोग किन मामलों में अधिक उपयुक्त है?",
+        "q_en": "In which cases is Nominal GDP more appropriate to use?",
+        "options": ["जब मुद्रास्फीति को समायोजित करना हो", "जब ऋण जैसे कारकों का विश्लेषण करना हो", "जब वास्तविक वृद्धि को मापना हो", "जब आधार वर्ष की कीमतों को मापना हो"],
+        "options_en": ["When adjusting for inflation", "When analyzing factors like debt", "When measuring real growth", "When measuring base-year prices"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि नाममात्र जीडीपी ऋण जैसे कारकों के विश्लेषण के लिए उपयुक्त है, क्योंकि यह वर्तमान कीमतों का उपयोग करता है।",
+        "explanation_en": "The notes state that nominal GDP is suitable for analyzing factors like debt, as it uses current prices."
+    },
+    {
+        "q": "SDDS में शामिल डेटा श्रेणियों का उद्देश्य क्या है?",
+        "q_en": "What is the purpose of the data categories included in SDDS?",
+        "options": ["केवल निर्यात को ट्रैक करना", "आर्थिक और वित्तीय डेटा की पारदर्शिता प्रदान करना", "केवल कर संग्रह को मापना", "केवल आयात को ट्रैक करना"],
+        "options_en": ["To track only exports", "To provide transparency in economic and financial data", "To measure only tax collection", "To track only imports"],
+        "answer": 1,
+        "explanation": "नोट्स में SDDS को आर्थिक और वित्तीय डेटा में पारदर्शिता प्रदान करने के लिए एक ढांचे के रूप में वर्णित किया गया है।",
+        "explanation_en": "The notes describe SDDS as a framework to provide transparency in economic and financial data."
+    },
+    {
+        "q": "कारक लागत पर जीडीपी बाजार मूल्य पर जीडीपी से भिन्न क्यों है?",
+        "q_en": "Why does GDP at Factor Cost differ from GDP at Market Price?",
+        "options": ["क्योंकि इसमें निर्यात शामिल नहीं है", "क्योंकि इसमें अप्रत्यक्ष कर और सब्सिडी का समायोजन होता है", "क्योंकि यह केवल आयात पर आधारित है", "क्योंकि यह मूल्यह्रास पर आधारित है"],
+        "options_en": ["Because it does not include exports", "Because it adjusts for indirect taxes and subsidies", "Because it is based only on imports", "Because it is based on depreciation"],
+        "answer": 1,
+        "explanation": "नोट्स में बताया गया है कि कारक लागत पर जीडीपी अप्रत्यक्ष करों और सब्सिडी के लिए समायोजित होती है, जो बाजार मूल्य पर जीडीपी से अलग है।",
+        "explanation_en": "The notes explain that GDP at factor cost adjusts for indirect taxes and subsidies, unlike GDP at market price."
+    },
+    {
+        "q": "राष्ट्रीय आय की गणना में उत्पाद विधि का उपयोग क्यों किया जाता है?",
+        "q_en": "Why is the Product Method used in calculating National Income?",
+        "options": ["क्योंकि यह केवल निर्यात को मापता है", "क्योंकि यह उत्पादन के मूल्य को मापता है", "क्योंकि यह केवल आयात को मापता है", "क्योंकि यह केवल कर संग्रह को मापता है"],
+        "options_en": ["Because it measures only exports", "Because it measures the value of production", "Because it measures only imports", "Because it measures only tax collection"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि उत्पाद/मूल्य वर्धित विधि उत्पादन के मूल्य को मापती है, जो राष्ट्रीय आय की गणना में योगदान देती है।",
+        "explanation_en": "The notes state that the product/value-added method measures the value of production, contributing to national income calculation."
+    },
+    {
+        "q": "यदि किसी देश में अप्रत्यक्ष कर बढ़ते हैं, लेकिन सब्सिडी स्थिर रहती है, तो कारक लागत पर जीडीपी पर क्या प्रभाव पड़ेगा?",
+        "q_en": "If indirect taxes increase in a country but subsidies remain constant, what will be the impact on GDP at Factor Cost?",
+        "options": ["यह बढ़ेगा", "यह घटेगा", "इसमें कोई बदलाव नहीं होगा", "यह शून्य हो जाएगा"],
+        "options_en": ["It will increase", "It will decrease", "There will be no change", "It will become zero"],
+        "answer": 2,
+        "explanation": "नोट्स में उल्लेख है कि कारक लागत पर जीडीपी = बाजार मूल्य पर जीडीपी - अप्रत्यक्ष कर + सब्सिडी। अप्रत्यक्ष करों में वृद्धि बाजार मूल्य पर जीडीपी को प्रभावित करती है, लेकिन कारक लागत पर जीडीपी अप्रभावित रहती है क्योंकि करों को घटाया जाता है।",
+        "explanation_en": "The notes state that GDP at factor cost = GDP at market price - indirect taxes + subsidies. An increase in indirect taxes affects GDP at market price, but GDP at factor cost remains unaffected as the taxes are subtracted."
+    },
+    {
+        "q": "यदि जीडीपी डिफ्लेटर 100 से कम है, तो इसका क्या अर्थ है?",
+        "q_en": "If the GDP Deflator is less than 100, what does it imply?",
+        "options": ["कीमतें आधार वर्ष की तुलना में बढ़ी हैं", "कीमतें आधार वर्ष की तुलना में घटी हैं", "निर्यात बढ़ा है", "आयात बढ़ा है"],
+        "options_en": ["Prices have increased compared to the base year", "Prices have decreased compared to the base year", "Exports have increased", "Imports have increased"],
+        "answer": 1,
+        "explanation": "नोट्स में बताया गया है कि 100 से कम जीडीपी डिफ्लेटर का मतलब है कि आधार वर्ष की तुलना में कीमतें घटी हैं (अपस्फीति)।",
+        "explanation_en": "The notes explain that a GDP deflator below 100 indicates that prices have decreased (deflation) compared to the base year."
+    },
+    {
+        "q": "राष्ट्रीय आय की गणना में स्थानांतरण भुगतान को शामिल न करने का प्रभाव क्या है?",
+        "q_en": "What is the effect of not including transfer payments in National Income?",
+        "options": ["यह आय को कम करके दिखाता है", "यह उत्पादन की सटीक तस्वीर देता है", "यह निर्यात को बढ़ाता है", "यह आयात को कम करता है"],
+        "options_en": ["It underestimates income", "It provides an accurate picture of production", "It increases exports", "It reduces imports"],
+        "answer": 1,
+        "explanation": "नोट्स में स्पष्ट किया गया है कि हस्तांतरण भुगतान को बाहर रखने से राष्ट्रीय आय केवल उत्पादन से उत्पन्न आय को दर्शाती है, जिससे उत्पादन की सटीक तस्वीर मिलती है।",
+        "explanation_en": "The notes clarify that excluding transfer payments ensures national income reflects only income from production, providing an accurate picture."
+    },
+    {
+        "q": "यदि आधार वर्ष को संशोधित नहीं किया जाता है, तो दीर्घकालिक आर्थिक विश्लेषण पर क्या प्रभाव पड़ सकता है?",
+        "q_en": "If the base year is not revised, what could be the impact on long-term economic analysis?",
+        "options": ["यह निर्यात को बढ़ाएगा", "यह आर्थिक प्रदर्शन को गलत तरीके से दर्शाएगा", "यह कर संग्रह को कम करेगा", "यह आयात को बढ़ाएगा"],
+        "options_en": ["It will increase exports", "It will misrepresent economic performance", "It will reduce tax collection", "It will increase imports"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि पुराना आधार वर्ष वर्तमान आर्थिक वास्तविकताओं को प्रतिबिंबित करने में विफल रहता है, जिससे दीर्घकालिक विश्लेषण गलत हो सकता है।",
+        "explanation_en": "The notes highlight that an outdated base year fails to reflect current economic realities, leading to inaccurate long-term analysis."
+    },
+    {
+        "q": "NNP की गणना में विदेश से शुद्ध कारक आय (NFIA) का क्या महत्व है?",
+        "q_en": "What is the significance of Net Factor Income from Abroad (NFIA) in calculating NNP?",
+        "options": ["यह केवल निर्यात को मापता है", "यह घरेलू और विदेशी आय के बीच अंतर को समायोजित करता है", "यह केवल आयात को मापता है", "यह केवल मूल्यह्रास को मापता है"],
+        "options_en": ["It measures only exports", "It adjusts for the difference between domestic and foreign income", "It measures only imports", "It measures only depreciation"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि NNP = GDP + NFIA - मूल्यह्रास, जहाँ NFIA विदेशों में अर्जित आय और विदेशियों द्वारा घरेलू आय के बीच समायोजन करता है।",
+        "explanation_en": "The notes state that NNP = GDP + NFIA - Depreciation, where NFIA adjusts for income earned abroad versus income earned by foreigners domestically."
+    },
+    {
+        "q": "यदि किसी देश में मूल्यह्रास बढ़ता है, तो NDP पर क्या प्रभाव पड़ेगा?",
+        "q_en": "If depreciation increases in a country, what will be the impact on NDP?",
+        "options": ["NDP बढ़ेगा", "NDP घटेगा", "NDP में कोई बदलाव नहीं होगा", "NDP शून्य हो जाएगा"],
+        "options_en": ["NDP will increase", "NDP will decrease", "There will be no change in NDP", "NDP will become zero"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि NDP = GDP - मूल्यह्रास। मूल्यह्रास में वृद्धि NDP को कम करती है।",
+        "explanation_en": "The notes specify that NDP = GDP - Depreciation. An increase in depreciation reduces NDP."
+    },
+    {
+        "q": "2015 में भारत द्वारा GVA पद्धति अपनाने का क्या प्रभाव पड़ा?",
+        "q_en": "What was the impact of India adopting the GVA method in 2015?",
+        "options": ["जीडीपी की गणना बंद हो गई", "जीडीपी डेटा की सटीकता में सुधार हुआ", "निर्यात में कमी आई", "आयात में वृद्धि हुई"],
+        "options_en": ["GDP calculation was stopped", "The accuracy of GDP data improved", "Exports decreased", "Imports increased"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि 2015 में GVA में बदलाव ने उत्पादन मूल्यों के साथ तालमेल करके जीडीपी गणना की सटीकता में सुधार किया।",
+        "explanation_en": "The notes mention that the shift to GVA in 2015 improved the accuracy of GDP calculations by aligning with production values."
+    },
+    {
+        "q": "सार्वजनिक आय में करों का प्राथमिक स्रोत होने का क्या महत्व है?",
+        "q_en": "What is the significance of taxes being the primary source of public income?",
+        "options": ["यह निर्यात को बढ़ाता है", "यह सरकार को सार्वजनिक सेवाओं के लिए धन प्रदान करता है", "यह आयात को कम करता है", "यह मूल्यह्रास को बढ़ाता है"],
+        "options_en": ["It increases exports", "It provides funds to the government for public services", "It reduces imports", "It increases depreciation"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि कर, सार्वजनिक आय के प्राथमिक स्रोत के रूप में, सार्वजनिक सेवाओं और बुनियादी ढांचे के लिए धन उपलब्ध कराते हैं।",
+        "explanation_en": "The notes highlight that taxes, as the primary source of public income, fund public services and infrastructure."
+    },
+    {
+        "q": "यदि किसी देश का NFIA नकारात्मक है, तो इसका NNP पर क्या प्रभाव पड़ेगा?",
+        "q_en": "If a country’s NFIA is negative, what will be the impact on NNP?",
+        "options": ["NNP बढ़ेगा", "NNP घटेगा", "NNP में कोई बदलाव नहीं होगा", "NNP शून्य हो जाएगा"],
+        "options_en": ["NNP will increase", "NNP will decrease", "There will be no change in NNP", "NNP will become zero"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि NNP = GDP + NFIA - मूल्यह्रास। नकारात्मक NFIA NNP को कम करता है।",
+        "explanation_en": "The notes state that NNP = GDP + NFIA - Depreciation. A negative NFIA reduces NNP."
+    },
+    {
+        "q": "आधार वर्ष को संशोधित करने से अंतरराष्ट्रीय मानकों का पालन कैसे होता है?",
+        "q_en": "How does revising the base year ensure compliance with international standards?",
+        "options": ["यह निर्यात को बढ़ाता है", "यह वैश्विक तुलना के लिए सटीक डेटा प्रदान करता है", "यह कर संग्रह को कम करता है", "यह आयात को बढ़ाता है"],
+        "options_en": ["It increases exports", "It provides accurate data for global comparison", "It reduces tax collection", "It increases imports"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि आधार वर्ष को संशोधित करने से SDDS जैसे अंतरराष्ट्रीय मानकों के साथ डेटा संरेखित होता है, जिससे वैश्विक तुलना के लिए सटीक डेटा मिलता है।",
+        "explanation_en": "The notes mention that revising the base year aligns data with international standards like SDDS for accurate global comparisons."
+    },
+    {
+        "q": "यदि किसी देश में अप्रत्यक्ष कर और सब्सिडी दोनों बढ़ते हैं, लेकिन समान मात्रा में, तो कारक लागत पर जीडीपी पर क्या प्रभाव पड़ेगा?",
+        "q_en": "If both indirect taxes and subsidies increase by the same amount in a country, what will be the impact on GDP at Factor Cost?",
+        "options": ["यह बढ़ेगा", "यह घटेगा", "इसमें कोई बदलाव नहीं होगा", "यह शून्य हो जाएगा"],
+        "options_en": ["It will increase", "It will decrease", "There will be no change", "It will become zero"],
+        "answer": 2,
+        "explanation": "नोट्स में सूत्र दिया गया है: कारक लागत पर जीडीपी = बाजार मूल्य पर जीडीपी - अप्रत्यक्ष कर + सब्सिडी। यदि अप्रत्यक्ष कर और सब्सिडी समान मात्रा में बढ़ते हैं, तो उनके प्रभाव रद्द हो जाते हैं, जिससे कारक लागत पर जीडीपी अपरिवर्तित रहती है।",
+        "explanation_en": "The notes provide the formula: GDP at factor cost = GDP at market price - indirect taxes + subsidies. If indirect taxes and subsidies increase by the same amount, their effects cancel out, leaving GDP at factor cost unchanged."
+    },
+    {
+        "q": "यदि जीडीपी डिफ्लेटर 150 है और नाममात्र जीडीपी 3000 अरब रुपये है, तो वास्तविक जीडीपी क्या होगी?",
+        "q_en": "If the GDP Deflator is 150 and Nominal GDP is 3000 billion rupees, what will be the Real GDP?",
+        "options": ["2000 अरब रुपये", "2500 अरब रुपये", "3000 अरब रुपये", "4500 अरब रुपये"],
+        "options_en": ["2000 billion rupees", "2500 billion rupees", "3000 billion rupees", "4500 billion rupees"],
+        "answer": 0,
+        "explanation": "नोट्स में सूत्र दिया गया है: वास्तविक जीडीपी = नाममात्र जीडीपी ÷ जीडीपी डिफ्लेटर (दशमलव रूप में)। यहाँ, 3000 ÷ (150/100) = 3000 ÷ 1.5 = 2000 अरब रुपये।",
+        "explanation_en": "The notes provide the formula: Real GDP = Nominal GDP ÷ GDP Deflator (in decimal form). Here, 3000 ÷ (150/100) = 3000 ÷ 1.5 = 2000 billion rupees."
+    },
+    {
+        "q": "यदि किसी देश का NFIA शून्य है, तो NNP और NDP में क्या संबंध होगा?",
+        "q_en": "If a country’s NFIA is zero, what will be the relationship between NNP and NDP?",
+        "options": ["NNP > NDP", "NNP = NDP", "NNP < NDP", "कोई संबंध नहीं"],
+        "options_en": ["NNP > NDP", "NNP = NDP", "NNP < NDP", "No relationship"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि NNP = GDP + NFIA - मूल्यह्रास और NDP = GDP - मूल्यह्रास। यदि NFIA शून्य है, तो NNP = GDP - मूल्यह्रास = NDP।",
+        "explanation_en": "The notes state that NNP = GDP + NFIA - Depreciation and NDP = GDP - Depreciation. If NFIA is zero, NNP = GDP - Depreciation = NDP."
+    },
+    {
+        "q": "यदि किसी देश में मूल्यह्रास शून्य है और NFIA नकारात्मक है, तो NNP और GDP में क्या संबंध होगा?",
+        "q_en": "If depreciation is zero and NFIA is negative in a country, what will be the relationship between NNP and GDP?",
+        "options": ["NNP > GDP", "NNP = GDP", "NNP < GDP", "कोई संबंध नहीं"],
+        "options_en": ["NNP > GDP", "NNP = GDP", "NNP < GDP", "No relationship"],
+        "answer": 2,
+        "explanation": "नोट्स में उल्लेख है कि NNP = GDP + NFIA - मूल्यह्रास। यदि मूल्यह्रास शून्य है और NFIA नकारात्मक है, तो NNP = GDP + (नकारात्मक मान), इसलिए NNP < GDP।",
+        "explanation_en": "The notes provide: NNP = GDP + NFIA - Depreciation. If depreciation is zero and NFIA is negative, NNP = GDP + (negative value), so NNP < GDP."
+    },
+    {
+        "q": "2015 में भारत द्वारा GVA पद्धति अपनाने से जीडीपी डेटा की सटीकता में सुधार कैसे हुआ?",
+        "q_en": "How did adopting the GVA method in 2015 improve the accuracy of India’s GDP data?",
+        "options": ["यह निर्यात को बढ़ाता है", "यह उत्पादन के मूल्य को बेहतर ढंग से मापता है", "यह आयात को कम करता है", "यह मूल्यह्रास को बढ़ाता है"],
+        "options_en": ["It increases exports", "It measures the value of production more effectively", "It reduces imports", "It increases depreciation"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि 2015 में GVA में बदलाव ने उत्पादन में मूल्य वर्धित पर ध्यान केंद्रित करके, आधुनिक आर्थिक संरचनाओं के साथ तालमेल करके सटीकता में सुधार किया।",
+        "explanation_en": "The notes state that the shift to GVA in 2015 improved accuracy by focusing on the value added in production, aligning with modern economic structures."
+    },
+    {
+        "q": "यदि किसी देश में नाममात्र जीडीपी स्थिर है, लेकिन जीडीपी डिफ्लेटर बढ़ रहा है, तो वास्तविक जीडीपी पर क्या प्रभाव पड़ेगा?",
+        "q_en": "If Nominal GDP is constant but the GDP Deflator is increasing, what will be the impact on Real GDP?",
+        "options": ["यह बढ़ेगा", "यह घटेगा", "इसमें कोई बदलाव नहीं होगा", "यह शून्य हो जाएगा"],
+        "options_en": ["It will increase", "It will decrease", "There will be no change", "It will become zero"],
+        "answer": 1,
+        "explanation": "नोट्स में उल्लेख है कि वास्तविक जीडीपी = नाममात्र जीडीपी ÷ जीडीपी डिफ्लेटर। यदि डिफ्लेटर बढ़ता है जबकि नाममात्र जीडीपी स्थिर है, तो वास्तविक जीडीपी अधिक डिवाइडर के कारण घटता है।",
+        "explanation_en": "The notes provide: Real GDP = Nominal GDP ÷ GDP Deflator. If the deflator increases while nominal GDP is constant, real GDP decreases due to the higher divisor."
+    },
+    {
+        "q": "राष्ट्रीय आय की गणना में आय विधि क्या मापती है?",
+        "q_en": "What does the Income Method measure in the calculation of National Income?",
+        "options": [
+            "केवल उपभोक्ता खर्च",
+            "उत्पादन से उत्पन्न सभी आय का योग",
+            "केवल सरकारी खर्च",
+            "केवल निर्यात आय"
+        ],
+        "options_en": [
+            "Consumer spending only",
+            "Sum of all incomes generated from production",
+            "Government spending only",
+            "Export income only"
+        ],
+        "answer": 1,
+        "explanation": "नोट्स में कहा गया है कि आय विधि वस्तुओं और सेवाओं के उत्पादन से उत्पन्न सभी आय का योग करती है।",
+        "explanation_en": "The notes state that the income method sums all incomes generated from the production of goods and services."
+    }
+
+    
+]
+
+        let selectedAnswers = new Array(questions.length).fill(null);
+        let submitted = false;
+        let score = 0;
+        let totalSeconds = 0;
+        let language = 'hi';
+        let timerInterval;
+        let answerTimes = [];
+        let startTime;
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                totalSeconds++;
+                document.getElementById('totalTime').innerText = formatTime(totalSeconds);
+                updateTimerBar();
+            }, 1000);
+        }
+
+        function updateTimerBar() {
+            const maxTime = 150;
+            const width = (1 - totalSeconds / maxTime) * 100;
+            let color;
+            if (totalSeconds <= 50) {
+                color = 'lightgreen';
+            } else if (totalSeconds <= 75) {
+                color = 'green';
+            } else if (totalSeconds <= 100) {
+                color = 'black';
+            } else {
+                color = 'red';
+            }
+            const fill = document.getElementById('timerBarFill');
+            fill.style.width = `${width}%`;
+            fill.style.background = color;
+            if (totalSeconds >= maxTime && !submitted) {
+                submitQuiz();
+            }
+        }
+
+        function loadQuestions() {
+            const quiz = document.getElementById('quiz');
+            const lang = document.getElementById('languageToggle').value;
+            const answered = selectedAnswers.filter(a => a !== null).length;
+            document.getElementById('progressBar').style.width = (answered / questions.length * 100) + '%';
+            document.getElementById('progressCircle').textContent = `${Math.round(answered / questions.length * 100)}%`;
+            document.getElementById('progressCircle').style.transform = 'scale(0)';
+            setTimeout(() => document.getElementById('progressCircle').style.transform = 'scale(1)', 10);
+
+            quiz.innerHTML = questions.map((q, index) => {
+                let cls = '';
+                if (selectedAnswers[index] !== null) {
+                    cls = 'answered';
+                }
+                return `
+                    <div class='card ${cls}'>
+                        <div class='question'>
+                            Q${index + 1}. ${lang === 'en' ? q.q_en : q.q}
+                            ${lang === 'both' ? `<div class='en'>Q${index + 1}. ${q.q_en}</div>` : ''}
+                        </div>
+                        <div class='options'>
+                            ${q.options.map((opt, i) => {
+                                let btnCls = '';
+                                if (selectedAnswers[index] !== null) {
+                                    if (i === q.answer) btnCls = 'correct disabled';
+                                    else if (selectedAnswers[index] === i) btnCls = 'wrong disabled';
+                                    else btnCls = 'disabled';
+                                }
+                                return `
+                                    <button class='${btnCls}' onclick='selectOption(${index}, ${i})' ${btnCls.includes('disabled') ? 'disabled' : ''}>
+                                        ${String.fromCharCode(65 + i)}) ${lang === 'en' ? q.options_en[i] : opt}
+                                        ${lang === 'both' ? `<div class='en'>${String.fromCharCode(65 + i)}) ${q.options_en[i]}</div>` : ''}
+                                    </button>`;
+                            }).join('')}
+                        </div>
+                        ${selectedAnswers[index] !== null ? `
+                            <div class='explanation ${selectedAnswers[index] !== null ? 'active' : ''}'>
+                                <b>Explanation:</b> ${lang === 'en' ? q.explanation_en : q.explanation}
+                                ${lang === 'both' ? `<div class='en'><b>Explanation:</b> ${q.explanation_en}</div>` : ''}
+                            </div>` : ''}
+                    </div>`;
+            }).join('');
+            document.getElementById('score').innerText = `Score: ${score} / ${questions.length}`;
+        }
+
+        function selectOption(qIndex, optIndex) {
+            if (submitted) return;
+            if (selectedAnswers[qIndex] !== null) return;
+
+            const endTime = Date.now();
+            const timeTaken = (endTime - startTime) / 1000; // Time in seconds
+            answerTimes[qIndex] = { time: timeTaken, correct: optIndex === questions[qIndex].answer };
+
+            selectedAnswers[qIndex] = optIndex;
+            if (optIndex === questions[qIndex].answer) {
+                score++;
+            }
+            document.getElementById('score').innerText = `Score: ${score} / ${questions.length}`;
+            loadQuestions();
+            startTime = Date.now(); // Reset start time for the next question
+        }
+
+        function submitQuiz() {
+            if (submitted) return;
+
+            selectedAnswers.forEach((answer, index) => {
+                if (answer === null) {
+                    selectedAnswers[index] = -1; // Mark unattempted
+                }
+            });
+
+            submitted = true;
+            document.getElementById('score').innerText = `Your Score: ${score} / ${questions.length} (Total Time: ${formatTime(totalSeconds)})`;
+            loadQuestions();
+            clearInterval(timerInterval);
+            setTimeout(goToDashboard, 2000);
+        }
+
+        function openRestartModal() {
+            if (submitted) {
+                alert('Cannot restart after submit');
+                return;
+            }
+            const checkboxes = document.getElementById('questionCheckboxes');
+            checkboxes.innerHTML = '';
+
+            const selectAllLabel = document.createElement('label');
+            const selectAll = document.createElement('input');
+            selectAll.type = 'checkbox';
+            selectAll.onclick = () => {
+                const cbs = document.querySelectorAll('#questionCheckboxes input[type="checkbox"]');
+                cbs.forEach(cb => {
+                    if (cb !== selectAll) cb.checked = selectAll.checked;
+                });
+            };
+            selectAllLabel.appendChild(selectAll);
+            selectAllLabel.appendChild(document.createTextNode('Select All'));
+            checkboxes.appendChild(selectAllLabel);
+            checkboxes.appendChild(document.createElement('br'));
+
+            questions.forEach((q, i) => {
+                const label = document.createElement('label');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = i;
+                label.appendChild(checkbox);
+                label.appendChild(document.createTextNode(`Question ${i + 1}`));
+                checkboxes.appendChild(label);
+                checkboxes.appendChild(document.createElement('br'));
+            });
+
+            document.getElementById('restartModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('restartModal').style.display = 'none';
+        }
+
+        function applyRestart() {
+            const checkboxes = document.querySelectorAll('#questionCheckboxes input[type="checkbox"]:checked');
+            checkboxes.forEach(cb => {
+                if (cb.value !== undefined) {
+                    const idx = parseInt(cb.value);
+                    if (selectedAnswers[idx] === questions[idx].answer) {
+                        score--;
+                    }
+                    selectedAnswers[idx] = null;
+                    answerTimes[idx] = null; // Clear answer time
+                }
+            });
+
+            closeModal();
+            document.getElementById('score').innerText = `Score: ${score} / ${questions.length}`;
+            loadQuestions();
+        }
+
+        function goToQuizPage() {
+            document.getElementById('startPage').style.display = 'none';
+            document.getElementById('quizPage').style.display = 'block';
+            document.getElementById('dashboardPage').style.display = 'none';
+            startTimer();
+            loadQuestions();
+            startTime = Date.now(); // Initialize start time for the first question
+        }
+
+        function goToDashboard() {
+            document.getElementById('startPage').style.display = 'none';
+            document.getElementById('quizPage').style.display = 'none';
+            document.getElementById('dashboardPage').style.display = 'block';
+            loadDashboard();
+        }
+
+        function loadDashboard() {
+            const totalQuestions = questions.length;
+            const attempted = selectedAnswers.filter(a => a !== null && a !== -1).length;
+            const unattempted = totalQuestions - attempted;
+            const correct = score;
+            const wrong = attempted - correct;
+            const scorePercentage = (correct / totalQuestions * 100).toFixed(1) || 0;
+           const totalMarks = `${totalQuestions} / ${correct}`; // 1 mark per question
+
+            const totalTime = formatTime(totalSeconds);
+            const avgTimePerQuestion = (totalSeconds / attempted).toFixed(1) || 0;
+            const speed = (attempted / (totalSeconds / 60)).toFixed(1) || 0;
+            const accuracy = (correct / attempted * 100).toFixed(1) || 0;
+            const efficiency = accuracy > 80 ? 'High' : accuracy > 60 ? 'Medium' : 'Low';
+            const percentile = accuracy > 90 ? 'Top 15%' : accuracy > 70 ? 'Top 30%' : 'Top 50%';
+            const rank = Math.floor(Math.random() * 280) + 1; // Placeholder
+            let longestStreak = 0;
+            let currentStreak = 0;
+            selectedAnswers.forEach((answer, i) => {
+                if (answer === questions[i].answer) {
+                    currentStreak++;
+                    longestStreak = Math.max(longestStreak, currentStreak);
+                } else {
+                    currentStreak = 0;
+                }
+            });
+            const bestSection = 'History (100%)'; // Static as per quiz context
+            const weakSection = 'N/A'; // Placeholder
+            const improvement = accuracy > 80 ? '+5%' : '+2%'; // Placeholder
+            const performanceLevel = accuracy > 80 ? 'Advanced' : accuracy > 60 ? 'Intermediate' : 'Beginner';
+            const medals = accuracy > 80 ? 'Accuracy Master' : 'N/A'; // Placeholder
+            const efficiencyScore = (accuracy * 0.9).toFixed(0); // Placeholder
+            const predictedScore = (scorePercentage * 1.02).toFixed(1); // Placeholder
+            const fastestAnswer = answerTimes.filter(t => t).length ? Math.min(...answerTimes.filter(t => t).map(t => t.time)).toFixed(0) : 'N/A';
+            const slowestAnswer = answerTimes.filter(t => t).length ? Math.max(...answerTimes.filter(t => t).map(t => t.time)).toFixed(0) : 'N/A';
+            const avgTimeCorrect = answerTimes.filter(t => t && t.correct).length ? (answerTimes.filter(t => t && t.correct).reduce((sum, t) => sum + t.time, 0) / answerTimes.filter(t => t && t.correct).length).toFixed(1) : 'N/A';
+            const avgTimeWrong = answerTimes.filter(t => t && !t.correct).length ? (answerTimes.filter(t => t && !t.correct).reduce((sum, t) => sum + t.time, 0) / answerTimes.filter(t => t && !t.correct).length).toFixed(1) : 'N/A';
+            const timeEfficiency = (1 - totalSeconds / (totalQuestions * 30)).toFixed(2); // Placeholder
+            const guessRate = wrong > 0 ? ((wrong / attempted) * 100).toFixed(1) : 0;
+            const firstHalfAccuracy = selectedAnswers.slice(0, Math.ceil(totalQuestions / 2)).filter((a, i) => a === questions[i].answer).length / Math.ceil(totalQuestions / 2) * 100 || 0;
+
+            const dashboardGrid = document.getElementById('dashboardGrid');
+            dashboardGrid.innerHTML = `
+                <div class="dash-box"><h4>Total Questions</h4><p>${totalQuestions}</p></div>
+                <div class="dash-box"><h4>Attempted</h4><p>${attempted}</p></div>
+                <div class="dash-box"><h4>Unattempted</h4><p>${unattempted}</p></div>
+                <div class="dash-box"><h4>Correct</h4><p>${correct}</p></div>
+                <div class="dash-box"><h4>Wrong</h4><p>${wrong}</p></div>
+                <div class="dash-box"><h4>Score</h4><p>${scorePercentage}%</p></div>
+                <div class="dash-box"><h4>Total Marks</h4><p>${totalMarks}</p></div>
+                <div class="dash-box"><h4>Total Time</h4><p>${totalTime}</p></div>
+                <div class="dash-box"><h4>Avg Time/Q</h4><p>${avgTimePerQuestion} sec</p></div>
+                <div class="dash-box"><h4>Speed</h4><p>${speed} Q/min</p></div>
+                <div class="dash-box"><h4>Accuracy</h4><p>${accuracy}%</p></div>
+                <div class="dash-box"><h4>Efficiency</h4><p>${efficiency}</p></div>
+                <div class="dash-box"><h4>Percentile</h4><p>${percentile}</p></div>
+                <div class="dash-box"><h4>Rank</h4><p>${rank} / 1</p></div>
+                <div class="dash-box"><h4>Longest Streak</h4><p>${longestStreak} Qs</p></div>
+                <div class="dash-box"><h4>Best Section</h4><p>${bestSection}</p></div>
+                <div class="dash-box"><h4>Weak Section</h4><p>${weakSection}</p></div>
+                <div class="dash-box"><h4>Improvement</h4><p>${improvement}</p></div>
+                <div class="dash-box"><h4>Performance Level</h4><p>${performanceLevel}</p></div>
+                <div class="dash-box"><h4>Medals</h4><p>${medals}</p></div>
+                <div class="dash-box"><h4>Efficiency Score</h4><p>${efficiencyScore}</p></div>
+                <div class="dash-box"><h4>Predicted Score</h4><p>${predictedScore}%</p></div>
+                <div class="dash-box"><h4>Questions/Min</h4><p>${speed} Q/min</p></div>
+                <div class="dash-box"><h4>Fastest Answer</h4><p>${fastestAnswer} sec</p></div>
+                <div class="dash-box"><h4>Slowest Answer</h4><p>${slowestAnswer} sec</p></div>
+                <div class="dash-box"><h4>Avg Time Correct</h4><p>${avgTimeCorrect} sec</p></div>
+                <div class="dash-box"><h4>Avg Time Wrong</h4><p>${avgTimeWrong} sec</p></div>
+                <div class="dash-box"><h4>Time Efficiency</h4><p>${timeEfficiency}</p></div>
+                <div class="dash-box"><h4>Guess Rate</h4><p>${guessRate}%</p></div>
+                <div class="dash-box"><h4>First-Half Accuracy</h4><p>${firstHalfAccuracy.toFixed(1)}%</p></div>
+            `;
+        }
+
+        // Initialize
+        document.getElementById('timerContainer').addEventListener('dblclick', function() {
+            this.classList.toggle('hidden');
+        });
+
+        // Load Google Fonts
+        const link = document.createElement('link');
+        link.href = 'https://fonts.googleapis.com/css2?family=Tangerine&family=Allura&family=Poppins:wght@400;600&display=swap';
+        link.rel = 'stylesheet';
+        document.head.appendChild(link);
+    </script>
+</body>
+</html>
